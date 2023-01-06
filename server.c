@@ -132,9 +132,9 @@ int main(int argc, char *argv[])
 
     getargs(&port,&num_of_threads, &max_requests_size, schedalg, argc, argv);
     // Creating queues
-    Queue q_waiting = createQueue(max_requests_size);
-    Queue q_handled = createQueue(max_requests_size);
-    Queue q_arr[] = {q_waiting, q_handled};
+//    Queue q_waiting = createQueue(max_requests_size);
+//    Queue q_handled = createQueue(max_requests_size);
+//    Queue q_arr[] = {q_waiting, q_handled};
     // Create pool threads
 //    pthread_t* pool = createPool(num_of_threads, q_arr);
 
@@ -166,8 +166,8 @@ int main(int argc, char *argv[])
         // do the work.
         //
      }
-        deleteQueue(q_waiting);
-        deleteQueue(q_handled);
+//        deleteQueue(q_waiting);
+//        deleteQueue(q_handled);
 //    free(pool);
 //    for(int i=0 ; i < num_of_threads; i++)
 //        pthread_cancel(pool[i]);

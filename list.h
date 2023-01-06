@@ -98,7 +98,7 @@ Node PopByPosition(Queue requests, int position)
     }
     else {
         p = requests->head;//assign head to p
-        if (count == value)
+        if (count == position)
         {
             p = popQueue(requests);
             requests->current_size--;

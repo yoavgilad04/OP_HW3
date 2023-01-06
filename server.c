@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
     int port, num_of_threads, max_requests_size;
     char schedalg[MAX_ALG];
 
-    getargs(&port,&num_of_threads, &max_requests_size, schedalg, argc, argv);
+    getargs(&port,&num_of_threads, &max_requests_size, &schedalg, argc, argv);
     // Creating queues
 //    Queue q_waiting = createQueue(max_requests_size);
 //    Queue q_handled = createQueue(max_requests_size);

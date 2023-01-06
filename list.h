@@ -47,7 +47,7 @@ Queue createQueue(int max_size)
 
 void deleteQueue(Queue q)
 {
-    Node n;
+    Node n = NULL;
     while(q->head != NULL)
     {
         n = popQueue(q);
@@ -57,10 +57,10 @@ void deleteQueue(Queue q)
 }
 
 void pushQueue(Queue requests, int value){
-    Node temp,p;// declare two nodes temp and p
-    temp = createNode(value);//createNode will return a new node with data = value and next pointing to NULL.
-    if(requests.head == NULL){
-        head = temp;     //when linked list is empty
+    Node temp = createNode(value);
+    Node p = NULL;
+    if(requests->head == NULL){
+        requests->head = temp;     //when linked list is empty
     }
     else {
         p = head;//assign head to p
@@ -72,9 +72,10 @@ void pushQueue(Queue requests, int value){
     requests->current_size++;
 }
 
-void popQueue(Queue requests){
-    Node temp,p;// declare two nodes temp and p
-    if(requests.head == NULL){
+Node popQueue(Queue requests){
+    Node p = NULL;
+    Node new_head = NULL;
+    if(requests->head == NULL){
         return NULL;
     }
     else {
@@ -88,14 +89,18 @@ void popQueue(Queue requests){
 
 int deleteByValue(Queue requests, int value)
 {
-    Node pre,p;// declare two nodes temp and p
-    if(requests.head == NULL){
-        return -1     //when linked list is empty
+    Node pre = NULL;
+    Node p = NULL;
+    if(requests->head == NULL){
+        return -1;    //when linked list is empty
     }
     else {
-        p = head;//assign head to p
+        p = requests->head;//assign head to p
         if (p->data == value)
+        {
             popQueue(requests);
+            requests->current_size--;
+        }
         while (p->next != NULL) {
             pre = p;
             p = p->next;//traverse the list until p is the last node.The last node always points to NULL.

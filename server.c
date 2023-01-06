@@ -36,7 +36,7 @@ pthread_cond_t cond_full; //The main thread will wait in this cond in case numbe
 pthread_cond_t cond_empty; //Worker threads will wait in this cond in case the number of request is zero
 
 
-p_thread_mutex_lock m_queues_size;
+pthread_mutex_lock m_queues_size;
 
 
 /**
@@ -83,8 +83,8 @@ int pthread_cond_destroy(pthread_cond_t *cond);
 
 void init_cond_and_locks(){
     pthread_mutex_init(&m_queues_size, NULL);
-    pthread_cond_init(&cond_full, NULL)
-    pthread_cond_init(&cond_empty, NULL)
+    pthread_cond_init(&cond_full, NULL);
+    pthread_cond_init(&cond_empty, NULL);
 }
 
 void* thread_routine(Queue q_arr) {
@@ -93,10 +93,10 @@ void* thread_routine(Queue q_arr) {
         Queue q_handled = q_arr[1];
         pthread_mutex_lock(&m_queues_size);
 
-        while (q_waiting.current_size == 0) {
+        while (q_waiting->current_size == 0) {
             pthread_cond_wait(&cond_empty, &m_queues_size);
         }
-        int request = popQueue(q_waiting);
+        int request = popQueue(q_waiting)->data;
         pushQueue(q_handled, request);
         pthread_mutex_unlock(&m_queues_size);
 

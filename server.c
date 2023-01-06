@@ -36,7 +36,7 @@ pthread_cond_t cond_full; //The main thread will wait in this cond in case numbe
 pthread_cond_t cond_empty; //Worker threads will wait in this cond in case the number of request is zero
 
 
-pthread_mutex_lock m_queues_size;
+pthread_mutex_t m_queues_size;
 
 
 /**

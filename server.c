@@ -146,21 +146,21 @@ int main(int argc, char *argv[])
         clientlen = sizeof(clientaddr);
         connfd = Accept(listenfd, (SA *)&clientaddr, (socklen_t *) &clientlen);
         pthread_mutex_lock(&m_queues_size);
-        while(q_waiting->current_size + q_handled->current_size == max_requests_size){
-            if(q_waiting->current_size == 0){
-                Close(connfd);
-                pthread_cond_wait(&cond_full, &m_queues_size);
-            }
-            else{
-                //Todo: Throwing waited requests algorithm
-                continue;
-            }
-        }
-        pushQueue(q_waiting, connfd);
-        pthread_cond_signal(&cond_empty);
-        pthread_mutex_unlock(&m_queues_size);
-
-        //
+//        while(q_waiting->current_size + q_handled->current_size == max_requests_size){
+//            if(q_waiting->current_size == 0){
+//                Close(connfd);
+//                pthread_cond_wait(&cond_full, &m_queues_size);
+//            }
+//            else{
+//                //Todo: Throwing waited requests algorithm
+//                continue;
+//            }
+//        }
+//        pushQueue(q_waiting, connfd);
+//        pthread_cond_signal(&cond_empty);
+//        pthread_mutex_unlock(&m_queues_size);
+//
+//        //
         // HW3: In general, don't handle the request in the main thread.
         // Save the relevant info in a buffer and have one of the worker threads
         // do the work.

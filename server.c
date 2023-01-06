@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
 //    pthread_t* pool = createPool(num_of_threads, q_arr);
 
     // create locks and cond_vars
-    init_cond_and_locks();
+//    init_cond_and_locks();
 
     listenfd = Open_listenfd(port);
     while (1) {

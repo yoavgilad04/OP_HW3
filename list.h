@@ -78,7 +78,7 @@ void pushQueue(Queue requests, int value){
         requests->head = temp;     //when linked list is empty
     }
     else {
-        p = head;//assign head to p
+        p = requests->head;//assign head to p
         while (p->next != NULL) {
             p = p->next;//traverse the list until p is the last node.The last node always points to NULL.
         }

@@ -45,6 +45,21 @@ Queue createQueue(int max_size)
     return q;
 }
 
+Node popQueue(Queue requests){
+    Node p = NULL;
+    Node new_head = NULL;
+    if(requests->head == NULL){
+        return NULL;
+    }
+    else {
+        p = requests->head;
+        new_head = p->next;
+        requests->head = new_head;
+        requests->current_size--;
+        return p;
+    }
+}
+
 void deleteQueue(Queue q)
 {
     Node n = NULL;
@@ -72,20 +87,6 @@ void pushQueue(Queue requests, int value){
     requests->current_size++;
 }
 
-Node popQueue(Queue requests){
-    Node p = NULL;
-    Node new_head = NULL;
-    if(requests->head == NULL){
-        return NULL;
-    }
-    else {
-        p = requests->head;
-        new_head = p->next;
-        requests->head = new_head;
-        requests->current_size--;
-        return p;
-    }
-}
 
 int deleteByValue(Queue requests, int value)
 {

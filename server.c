@@ -13,16 +13,20 @@
 
 #define MAX_ALG 7
 // HW3: Parse the new arguments too
-void getargs(int *port, int *num_of_threads, int *max_queue_size, char* schedalg, int argc, char *argv[])
+void getargs(int *port, int *num_of_threads, int *max_queue_size, char** schedalg, int argc, char *argv[])
 {
     if (argc < 2) {
 	fprintf(stderr, "Usage: %s <port>\n", argv[0]);
 	exit(1);
     }
-    *port = atoi(argv[1]);
-    *num_of_threads = atoi(argv[2]);
-    *max_queue_size = atoi(argv[3]);
-    *schedalg = argv[4];
+    if (argc >= 2)
+        *port = atoi(argv[1]);
+    if (argc >= 3)
+        *num_of_threads = atoi(argv[2]);
+    if (argc >= 4)
+        *max_queue_size = atoi(argv[3]);
+    if (argc >= 5)
+        *schedalg = argv[4];
 }
 
 /**

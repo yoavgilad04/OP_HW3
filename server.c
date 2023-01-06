@@ -31,18 +31,12 @@ void getargs(int *port, int *num_of_threads, int *max_queue_size, char* schedalg
  * 2) The threads wait if the number of request is zero
  * 3) If one thread change queue sizes then other threads need to wait for it to finish.
  * 4) If there are no requests in the waiting queue all threads most wait for a request
- * 5)
  */
 pthread_cond_t cond_full; //The main thread will wait in this cond in case number of request are maximize
 pthread_cond_t cond_empty; //Worker threads will wait in this cond in case the number of request is zero
-pthread_cond_t cond_read_size; //Worker threads that want to read the size of the queues will wait if a thread changes the size
-pthread_cond_t cond_write_size; //Worker threads that want to change the size will wait in case a thread reads the size
 
 
-p_thread_mutex_lock m_reader_inside;
-p_thread_mutex_lock m_writer_inside;
-p_thread_mutex_lock m_full;
-p_thread_mutex_lock m_empty;
+p_thread_mutex_lock m_queues_size;
 
 
 /**
@@ -73,12 +67,47 @@ int pthread_mutex_destroy(pthread_mutex_t *mutex);
 
 ערך מוחזר: הפעולה תמיד מצליחה ומחזירה 0.
 
- */
-void* thread_routine(Queue q_arr)
-{
+ int pthread_cond_broadcast(pthread_cond_t *cond);
+משחררת את כל החוטים הממתינים.
+כל החוטים מפסיקים להמתין על משתנה התנאי ועוברים להמתין על המנעול. החוטים יחזרו לפעילות בזה אחר זה (בסדר כלשהו, לאו דווקא הוגן) לאחר שינעלו מחדש את ה-mutex.
 
-    // check if max size, push_to_handled, pop_waiting
-    return;
+
+ int pthread_cond_init(pthread_cond_t *cond,
+		pthread_condattr_t *cond_attr);
+ערך מוחזר: הפעולה תמיד מצליחה ומחזירה 0.
+
+int pthread_cond_destroy(pthread_cond_t *cond);
+ערך מוחזר: 0 בהצלחה, ערך שונה מ-0 בכישלון (למשל, אם יש עדיין חוטים הממתינים על משתנה התנאי).
+
+ */
+
+void init_cond_and_locks(){
+    pthread_mutex_init(&m_queues_size, NULL);
+    pthread_cond_init(&cond_full, NULL)
+    pthread_cond_init(&cond_empty, NULL)
+}
+
+void* thread_routine(Queue q_arr) {
+    while(1){
+        Queue q_waiting = q_arr[0];
+        Queue q_handled = q_arr[1];
+        pthread_mutex_lock(&m_queues_size);
+
+        while (q_waiting.current_size == 0) {
+            pthread_cond_wait(&cond_empty, &m_queues_size);
+        }
+        int request = popQueue(q_waiting);
+        pushQueue(q_handled, request);
+        pthread_mutex_unlock(&m_queues_size);
+
+        requestHandle(request);
+        Close(request);
+
+        pthread_mutex_lock(&m_queues_size);
+        deleteByValue(q_handled, request);
+        pthread_mutex_unlock(&m_queues_size);
+        pthread_cond_signal(&cond_full);
+    }
 }
 
 p_thread* createPool(num_of_threads, Queue q_arr)
@@ -91,75 +120,52 @@ p_thread* createPool(num_of_threads, Queue q_arr)
     return pool;
 }
 
-void reader_lock() {
-    mutex_lock(&global_lock);
-    while (writers_inside > 0)
-        cond_wait(&read_allowed, &global_lock);
-    readers_inside++;
-    mutex_unlock(&global_lock);
-}
 
-void reader_unlock() {
-    mutex_lock(&global_lock);
-    readers_inside--;
-    if (readers_inside == 0)
-        cond_signal(&write_allowed);
-    mutex_unlock(&global_lock);
-}
 
 int main(int argc, char *argv[])
 {
     int listenfd, connfd, clientlen;
     struct sockaddr_in clientaddr;
-    int port, num_of_threads, max_queue_size;
+    int port, num_of_threads, max_requests_size;
     char schedalg[MAX_ALG];
 
-    getargs(&port,&num_of_threads, &max_queue_size, schedalg, argc, argv);
+    getargs(&port,&num_of_threads, &max_requests_size, schedalg, argc, argv);
     // Creating queues
-    Queue q_waiting = createQueue(max_queue_size);
-    Queue q_handled = createQueue(max_queue_size);
+    Queue q_waiting = createQueue(max_requests_size);
+    Queue q_handled = createQueue(max_requests_size);
     Queue q_arr[] = {q_waiting, q_handled};
     // Create pool threads
     p_thread* pool = createPool(num_of_threads, q_arr);
 
     // create locks and cond_vars
-    p_thread_mutex_lock m_waiting;
-    p_thread_mutex_lock m_handled;
-    pthread_mutex_init(&m_wating, NULL);
-    pthread_mutex_init(&m_handled, NULL);
-
-
-
-    pthread_cond_init(&cond1, NULL);
-    pthread_cond_init(&cond2, NULL);
-
-
-//    pthread_cond_init(&cond1, condition);
-/**enquea:
- *  while(waitinh_size + handling_size == max_size)
-        cond_full a
-
- * dque:
- while(waiting_size == 0 )
-        cond_empty
- size--;
- signal(cond_full)
- * *//
+    init_cond_and_locks();
 
     listenfd = Open_listenfd(port);
     while (1) {
 	clientlen = sizeof(clientaddr);
 	connfd = Accept(listenfd, (SA *)&clientaddr, (socklen_t *) &clientlen);
+    pthread_mutex_lock(&m_queues_size);
+    while(q_waiting->current_size + q_handled->current_size == max_requests_size){
+        if(q_waiting->current_size == 0){
+            Close(connfd);
+            pthread_cond_wait(&cond_full, &m_queues_size);
+        }
+        else{
+            //Todo: Throwing waited requests algorithm
+            continue;
+        }
+    }
+    pushQueue(q_waiting, connfd);
+    pthread_cond_signal(&cond_empty);
+    pthread_mutex_unlock(&m_queues_size);
 
-	// 
+	//
 	// HW3: In general, don't handle the request in the main thread.
 	// Save the relevant info in a buffer and have one of the worker threads 
 	// do the work. 
-	// 
-	requestHandle(connfd);
-
-	Close(connfd);
-    }
+	//
+        thread_routine()
+     }
 
 }
 

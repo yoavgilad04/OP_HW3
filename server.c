@@ -87,7 +87,7 @@ void init_cond_and_locks(){
     pthread_cond_init(&cond_empty, NULL);
 }
 
-void* thread_routine(Queue q_arr) {
+void* thread_routine(Queue* q_arr) {
     while(1){
         Queue q_waiting = q_arr[0];
         Queue q_handled = q_arr[1];

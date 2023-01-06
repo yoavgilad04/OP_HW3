@@ -108,11 +108,12 @@ void* thread_routine(Queue q_arr) {
         pthread_mutex_unlock(&m_queues_size);
         pthread_cond_signal(&cond_full);
     }
+
 }
 
-p_thread* createPool(num_of_threads, Queue q_arr)
+pthread_t* createPool(num_of_threads, Queue q_arr)
 {
-    p_thread *pool = (p_thread*)malloc(sizeof(*pool)*num_of_threads);
+    pthread_t *pool = (pthread_t*)malloc(sizeof(*pool)*num_of_threads);
     for(int i=0; i<num_of_threads; i++)
     {
         pthread_create(pool+i, NULL, thread_routine, (void*)q_arr);
@@ -135,7 +136,7 @@ int main(int argc, char *argv[])
     Queue q_handled = createQueue(max_requests_size);
     Queue q_arr[] = {q_waiting, q_handled};
     // Create pool threads
-    p_thread* pool = createPool(num_of_threads, q_arr);
+    pthread_t* pool = createPool(num_of_threads, q_arr);
 
     // create locks and cond_vars
     init_cond_and_locks();
@@ -164,9 +165,12 @@ int main(int argc, char *argv[])
 	// Save the relevant info in a buffer and have one of the worker threads 
 	// do the work. 
 	//
-        thread_routine()
      }
-
+    deleteQueue(q_waiting);
+    deleteQueue(q_handled);
+    free(pool);
+//    for(int i=0 ; i < num_of_threads; i++)
+//        pthread_cancel(pool[i]);
 }
 
 

@@ -131,7 +131,7 @@ void deleteRandHalf(Queue requests) {
     int half_size = ceil(requests->current_size / 2);
     int r;
     Node request;
-    for (int i = 0; i < half_size, i++) {
+    for (int i = 0; i < half_size; i++) {
         r = rand() % requests->current_size;
         request = PopByPosition(requests, r);
         Close(request->data);

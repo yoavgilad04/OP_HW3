@@ -26,7 +26,7 @@ void getargs(int *port, int *num_of_threads, int *max_queue_size, char* schedalg
     if (argc >= 4)
         *max_queue_size = atoi(argv[3]);
     if (argc >= 5)
-        strcopy(schedalg, *(argv[4]));
+        strcpy(schedalg, argv[4]);
 }
 
 /**

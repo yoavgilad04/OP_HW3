@@ -88,6 +88,36 @@ void pushQueue(Queue requests, int value){
 }
 
 
+Node PopByPosition(Queue requests, int position)
+{
+    int count = 0;
+    Node pre = NULL;
+    Node p = NULL;
+    if(requests->head == NULL){
+        return NULL;    //when linked list is empty
+    }
+    else {
+        p = requests->head;//assign head to p
+        if (count == value)
+        {
+            p = popQueue(requests);
+            requests->current_size--;
+            return p;
+        }
+        while (p->next != NULL) {
+            count++;
+            pre = p;
+            p = p->next;//traverse the list until p is the last node.The last node always points to NULL.
+            if(count == position) {
+                pre->next = p->next;
+                requests->current_size--;
+                return p;
+            }
+        }
+        return NULL;
+    }
+}
+
 int deleteByValue(Queue requests, int value)
 {
     Node pre = NULL;
@@ -99,7 +129,7 @@ int deleteByValue(Queue requests, int value)
         p = requests->head;//assign head to p
         if (p->data == value)
         {
-            popQueue(requests);
+            deleteNode(popQueue(requests));
             requests->current_size--;
         }
         while (p->next != NULL) {

@@ -13,7 +13,7 @@
 
 #define MAX_ALG 7
 // HW3: Parse the new arguments too
-void getargs(int *port, int *num_of_threads, int *max_queue_size, char* schedalg, int argc, char *argv[])
+void getargs(int *port, int *num_of_threads, int *max_queue_size, char* policy, int argc, char *argv[])
 {
     if (argc < 2) {
 	fprintf(stderr, "Usage: %s <port>\n", argv[0]);
@@ -26,7 +26,7 @@ void getargs(int *port, int *num_of_threads, int *max_queue_size, char* schedalg
     if (argc >= 4)
         *max_queue_size = atoi(argv[3]);
     if (argc >= 5)
-        strcpy(schedalg, argv[4]);
+        strcpy(policy, argv[4]);
 }
 
 /**
@@ -125,6 +125,17 @@ pthread_t* createPool(int num_of_threads, Queue* q_arr)
     return pool;
 }
 
+void deleteRandHalf(Queue requests) {
+    int half_size = ceil(requests->current_size / 2);
+    int r;
+    Node request;
+    for (int i = 0; i < half_size, i++) {
+        r = rand() % requests->current_size;
+        request = PopByPosition(requests, r);
+        Close(request->data);
+        deleteNode(request);
+    }
+}
 
 
 int main(int argc, char *argv[])
@@ -132,9 +143,9 @@ int main(int argc, char *argv[])
     int listenfd, connfd, clientlen;
     struct sockaddr_in clientaddr;
     int port, num_of_threads, max_requests_size;
-    char schedalg[MAX_ALG];
+    char policy[MAX_ALG];
 
-    getargs(&port,&num_of_threads, &max_requests_size, schedalg, argc, argv);
+    getargs(&port,&num_of_threads, &max_requests_size, policy, argc, argv);
     // Creating queues
     Queue q_waiting = createQueue(max_requests_size);
     Queue q_handled = createQueue(max_requests_size);
@@ -144,27 +155,60 @@ int main(int argc, char *argv[])
 
     // create locks and cond_vars
     init_cond_and_locks();
-
+    bool to_outer_loop;
     listenfd = Open_listenfd(port);
     while (1) {
+        to_outer_loop = false;
         clientlen = sizeof(clientaddr);
         connfd = Accept(listenfd, (SA *)&clientaddr, (socklen_t *) &clientlen);
         pthread_mutex_lock(&m_queues_size);
         while(q_waiting->current_size + q_handled->current_size == max_requests_size){
             if(q_waiting->current_size == 0){
                 Close(connfd);
-                pthread_cond_wait(&cond_full, &m_queues_size);
+                pthread_mutex_unlock(&m_queues_size);
+                continue;
             }
             else{
                 //Todo: Throwing waited requests algorithm
-                continue;
+                // is_block -> stop getting requests and once there is a spot for the request push the new request
+                if (strcmp(policy,  'block'))
+                {
+                    while(q_waiting->current_size + q_handled->current_size == max_requests_size)
+                        pthread_cond_wait(&cond_full, &m_queues_size);
+                    break;
+                }
+                    // drop_tail -> should close the fd, and continue to the next iteration of the while(1)
+                else if (strcmp(policy,  'dt'))
+                {
+                    Close(connfd);
+                    to_outer_loop = true;
+                    break;
+                }
+                    // drop_head -> execute q_waiting.pop and q_wating.push(new_request)
+                else if (strcmp(policy,  'dh'))
+                {
+                    Node request = popQueue(q_waiting);
+                    Close(request->data);
+                    deleteNode(request);
+                    continue;
+                }
+                    // drop_random -> q_waiting.deleteRand()
+                else if (strcmp(policy,  'random'))
+                {
+                    deleteRandHalf(q_waiting);
+                    continue;
+                }
             }
+        }
+        if(to_outer_loop == true)
+        {
+            pthread_mutex_unlock(&m_queues_size);
+            continue;
         }
         pushQueue(q_waiting, connfd);
         pthread_cond_signal(&cond_empty);
         pthread_mutex_unlock(&m_queues_size);
 
-//        //
         // HW3: In general, don't handle the request in the main thread.
         // Save the relevant info in a buffer and have one of the worker threads
         // do the work.

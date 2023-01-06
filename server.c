@@ -135,14 +135,14 @@ int main(int argc, char *argv[])
     char schedalg[MAX_ALG];
 
     getargs(&port,&num_of_threads, &max_requests_size, schedalg, argc, argv);
-     Creating queues
+    // Creating queues
     Queue q_waiting = createQueue(max_requests_size);
     Queue q_handled = createQueue(max_requests_size);
     Queue q_arr[] = {q_waiting, q_handled};
-     Create pool threads
+    // Create pool threads
     pthread_t* pool = createPool(num_of_threads, q_arr);
 
-     create locks and cond_vars
+    // create locks and cond_vars
     init_cond_and_locks();
 
     listenfd = Open_listenfd(port);

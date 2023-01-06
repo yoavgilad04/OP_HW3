@@ -136,39 +136,39 @@ int main(int argc, char *argv[])
     Queue q_handled = createQueue(max_requests_size);
     Queue q_arr[] = {q_waiting, q_handled};
     // Create pool threads
-    pthread_t* pool = createPool(num_of_threads, q_arr);
+//    pthread_t* pool = createPool(num_of_threads, q_arr);
 
     // create locks and cond_vars
     init_cond_and_locks();
 
     listenfd = Open_listenfd(port);
     while (1) {
-	clientlen = sizeof(clientaddr);
-	connfd = Accept(listenfd, (SA *)&clientaddr, (socklen_t *) &clientlen);
-    pthread_mutex_lock(&m_queues_size);
-    while(q_waiting->current_size + q_handled->current_size == max_requests_size){
-        if(q_waiting->current_size == 0){
-            Close(connfd);
-            pthread_cond_wait(&cond_full, &m_queues_size);
+        clientlen = sizeof(clientaddr);
+        connfd = Accept(listenfd, (SA *)&clientaddr, (socklen_t *) &clientlen);
+        pthread_mutex_lock(&m_queues_size);
+        while(q_waiting->current_size + q_handled->current_size == max_requests_size){
+            if(q_waiting->current_size == 0){
+                Close(connfd);
+                pthread_cond_wait(&cond_full, &m_queues_size);
+            }
+            else{
+                //Todo: Throwing waited requests algorithm
+                continue;
+            }
         }
-        else{
-            //Todo: Throwing waited requests algorithm
-            continue;
-        }
-    }
-    pushQueue(q_waiting, connfd);
-    pthread_cond_signal(&cond_empty);
-    pthread_mutex_unlock(&m_queues_size);
+        pushQueue(q_waiting, connfd);
+        pthread_cond_signal(&cond_empty);
+        pthread_mutex_unlock(&m_queues_size);
 
-	//
-	// HW3: In general, don't handle the request in the main thread.
-	// Save the relevant info in a buffer and have one of the worker threads 
-	// do the work. 
-	//
+        //
+        // HW3: In general, don't handle the request in the main thread.
+        // Save the relevant info in a buffer and have one of the worker threads
+        // do the work.
+        //
      }
-    deleteQueue(q_waiting);
-    deleteQueue(q_handled);
-    free(pool);
+        deleteQueue(q_waiting);
+        deleteQueue(q_handled);
+//    free(pool);
 //    for(int i=0 ; i < num_of_threads; i++)
 //        pthread_cancel(pool[i]);
 }

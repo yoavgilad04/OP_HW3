@@ -11,6 +11,8 @@
 // Most of the work is done within routines written in request.c
 //
 
+#define true 1
+#define false 0
 #define MAX_ALG 7
 // HW3: Parse the new arguments too
 void getargs(int *port, int *num_of_threads, int *max_queue_size, char* policy, int argc, char *argv[])
@@ -155,7 +157,7 @@ int main(int argc, char *argv[])
 
     // create locks and cond_vars
     init_cond_and_locks();
-    bool to_outer_loop;
+    int to_outer_loop;
     listenfd = Open_listenfd(port);
     while (1) {
         to_outer_loop = false;

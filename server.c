@@ -111,7 +111,7 @@ void* thread_routine(Queue q_arr) {
 
 }
 
-pthread_t* createPool(num_of_threads, Queue* q_arr)
+pthread_t* createPool(int num_of_threads, Queue* q_arr)
 {
     pthread_t *pool = (pthread_t*)malloc(sizeof(*pool)*num_of_threads);
     for(int i=0; i<num_of_threads; i++)

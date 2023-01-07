@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
         if(q_waiting->current_size + q_handled->current_size == max_requests_size){
             if(q_waiting->current_size == 0){
                 Close(connfd);
-                //pthread_mutex_unlock(&m_queues_size);
+                pthread_mutex_unlock(&m_queues_size);
                 continue;
             }
             else{
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
                 else if (strcmp(policy,  'dt') == 0)
                 {
                     Close(connfd);
-                //    pthread_mutex_unlock(&m_queues_size);
+                    pthread_mutex_unlock(&m_queues_size);
                     continue;
                 }
                     // drop_head -> execute q_waiting.pop and q_wating.push(new_request)
@@ -174,9 +174,9 @@ int main(int argc, char *argv[])
             }
         }
         pushQueue(q_waiting, connfd, arrival_time, arrival_time);
-        pthread_cond_signal(&cond_empty);
         pthread_mutex_unlock(&m_queues_size);
-     }
+        pthread_cond_signal(&cond_empty);
+    }
     deleteQueue(q_waiting);
     deleteQueue(q_handled);
     free(pool);

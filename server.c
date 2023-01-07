@@ -82,7 +82,8 @@ void* thread_routine(struct routine_args* args) {
 
         pthread_mutex_lock(&m_queues_size);
         deleteByValue(q_handled, connfd);
-        pthread_cond_signal(&cond_full);
+        if (q_waiting->current_size + q_handled->current_size < q_waiting->max_size)
+            pthread_cond_signal(&cond_full);
         pthread_mutex_unlock(&m_queues_size);
     }
 

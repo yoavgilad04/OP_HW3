@@ -81,9 +81,9 @@ void* thread_routine(struct routine_args* args) {
         pthread_mutex_unlock(&m_queues_size);
 
         requestHandle(connfd, &stats);
+        Close(connfd);
 
         pthread_mutex_lock(&m_queues_size);
-        Close(connfd);
         deleteByValue(q_handled, connfd);
         pthread_cond_signal(&cond_full);
         pthread_mutex_unlock(&m_queues_size);
@@ -143,11 +143,7 @@ int main(int argc, char *argv[])
         struct timeval arrival_time;
         gettimeofday(&arrival_time, NULL);
         if(q_waiting->current_size + q_handled->current_size == max_requests_size){
-            if(q_waiting->current_size == 0){
-                Close(connfd);
-                to_outer_loop = 1;
-            }
-            else{
+
                 //Todo: Throwing waited requests algorithm
                 // is_block -> stop getting requests and once there is a spot for the request push the new request
                 if (strcmp(policy,  'block') == 0)

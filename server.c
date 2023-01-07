@@ -23,6 +23,7 @@ struct routine_args{
     Queue handling;
     int i;
 };
+
 void getargs(int *port, int *num_of_threads, int *max_queue_size, char* policy, int argc, char *argv[])
 {
     if (argc < 2) {
@@ -144,26 +145,26 @@ int main(int argc, char *argv[])
             else{
                 //Todo: Throwing waited requests algorithm
                 // is_block -> stop getting requests and once there is a spot for the request push the new request
-                if (strcmp(policy,  'block'))
+                if (strcmp(policy,  'block') == 0)
                 {
                     while(q_waiting->current_size + q_handled->current_size == max_requests_size)
                         pthread_cond_wait(&cond_full, &m_queues_size);
                 }
                     // drop_tail -> should close the fd, and continue to the next iteration of the while(1)
-                else if (strcmp(policy,  'dt'))
+                else if (strcmp(policy,  'dt') == 0)
                 {
                     Close(connfd);
                     continue;
                 }
                     // drop_head -> execute q_waiting.pop and q_wating.push(new_request)
-                else if (strcmp(policy,  'dh'))
+                else if (strcmp(policy,  'dh') == 0)
                 {
                     Node request = popQueue(q_waiting);
                     Close(request->data);
                     deleteNode(request);
                 }
                     // drop_random -> q_waiting.deleteRand()
-                else if (strcmp(policy,  'random'))
+                else if (strcmp(policy,  'random') == 0)
                 {
                     deleteRandHalf(q_waiting);
                 }

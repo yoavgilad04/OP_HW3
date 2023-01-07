@@ -110,7 +110,7 @@ void requestServeDynamic(int fd, char *filename, char *cgiargs)
    // The CGI script has to finish writing out the header.
    sprintf(buf, "HTTP/1.0 200 OK\r\n");
    sprintf(buf, "%sServer: OS-HW3 Web Server\r\n", buf);
-
+   printsomething(buf);
    Rio_writen(fd, buf, strlen(buf));
 
    if (Fork() == 0) {
@@ -143,7 +143,7 @@ void requestServeStatic(int fd, char *filename, int filesize)
    sprintf(buf, "%sServer: OS-HW3 Web Server\r\n", buf);
    sprintf(buf, "%sContent-Length: %d\r\n", buf, filesize);
    sprintf(buf, "%sContent-Type: %s\r\n\r\n", buf, filetype);
-
+    printsomething(buf);
    Rio_writen(fd, buf, strlen(buf));
 
    //  Writes out to the client socket the memory-mapped file 
@@ -152,15 +152,17 @@ void requestServeStatic(int fd, char *filename, int filesize)
 
 }
 
-void printStats(int fd, struct timeval arrival_time, struct timeval handled_time){
-    char buf[MAXBUF];
-    long dispatch_tv_sec = handled_time.tv_sec - arrival_time.tv_sec;
-    long dispatch_tv_usec = handled_time.tv_usec - arrival_time.tv_usec;
-
-    sprintf(buf, "%sStat-Req-Arrival:: %lu.%06lu\r\n", buf, arrival_time.tv_sec, arrival_time.tv_usec);
-    sprintf(buf, "%sStat-Req-Dispatch:: %lu.%06lu\r\n", buf, dispatch_tv_sec, dispatch_tv_usec);
-    Rio_writen(fd, buf, strlen(buf));
-
+//void printStats(char* buf , struct timeval arrival_time, struct timeval handled_time){
+//    long dispatch_tv_sec = handled_time.tv_sec - arrival_time.tv_sec;
+//    long dispatch_tv_usec = handled_time.tv_usec - arrival_time.tv_usec;
+//
+//    sprintf(buf, "%sStat-Req-Arrival:: %lu.%06lu\r\n", buf, arrival_time.tv_sec, arrival_time.tv_usec);
+//    sprintf(buf, "%sStat-Req-Dispatch:: %lu.%06lu\r\n", buf, dispatch_tv_sec, dispatch_tv_usec);
+//
+//}
+void printsomething(char* buf)
+{
+        sprintf(buf, "%sStat-Req-Arrival:: \r\n", buf);
 }
 // handle a request
 void requestHandle(int fd, struct timeval arrival_time, struct timeval handled_time)
@@ -202,7 +204,6 @@ void requestHandle(int fd, struct timeval arrival_time, struct timeval handled_t
       }
       requestServeDynamic(fd, filename, cgiargs);
    }
-   printStats(fd, arrival_time, handled_time);
 }
 
 

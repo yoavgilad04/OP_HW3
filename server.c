@@ -109,7 +109,7 @@ void* thread_routine(Queue* q_arr) {
         pushQueue(q_handled, request_num, arrival, handle);
         pthread_mutex_unlock(&m_queues_size);
 
-        requestHandle(request);
+        requestHandle(request, arrival, handle);
         Close(request_num);
 
         pthread_mutex_lock(&m_queues_size);

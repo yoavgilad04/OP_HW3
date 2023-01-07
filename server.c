@@ -81,8 +81,8 @@ void* thread_routine(int* id) {
 
         pthread_mutex_lock(&m_queues_size);
         deleteByValue(q_handled, connfd);
-        pthread_mutex_unlock(&m_queues_size);
         pthread_cond_signal(&cond_full);
+        pthread_mutex_unlock(&m_queues_size);
     }
 
 }

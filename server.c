@@ -16,7 +16,8 @@
 #define MAX_ALG 7
 // HW3: Parse the new arguments too
 struct routine_args{
-    Queue* q_arr;
+    Queue waiting;
+    Queue handling;
     int i;
 };
 void getargs(int *port, int *num_of_threads, int *max_queue_size, char* policy, int argc, char *argv[])
@@ -85,11 +86,12 @@ void* thread_routine(struct routine_args* args) {
 
 }
 
-pthread_t* createPool(int num_of_threads, Queue* q_arr)
+pthread_t* createPool(int num_of_threads, Queue waiting, Queue handling)
 {
     pthread_t *pool = (pthread_t*)malloc(sizeof(*pool)*num_of_threads);
     struct routine_args args;
-    args.q_arr = q_arr;
+    args.waiting = waiting;
+    args. handling = handling;
     for(int i=0; i<num_of_threads; i++)
     {
         args.i = i;
@@ -122,9 +124,8 @@ int main(int argc, char *argv[])
     // Creating queues
     Queue q_waiting = createQueue(max_requests_size);
     Queue q_handled = createQueue(max_requests_size);
-    Queue q_arr[] = {q_waiting, q_handled};
     // Create pool threads
-    pthread_t* pool = createPool(num_of_threads, q_arr);
+    pthread_t* pool = createPool(num_of_threads, q_waiting, q_handled);
 
     // create locks and cond_vars
     init_cond_and_locks();

@@ -218,6 +218,7 @@ void requestHandle(int fd, Stats* stats)
       }
       requestServeDynamic(fd, filename, cgiargs, stats);
    }
+   return;
 }
 
 

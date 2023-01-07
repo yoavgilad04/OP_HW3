@@ -1,6 +1,9 @@
 #include "segel.h"
 #include "request.h"
 #include "list.h"
+#include <pthread.h>
+#include <semaphore.h>
+
 //
 // server.c: A very, very simple web server
 //
@@ -178,8 +181,8 @@ int main(int argc, char *argv[])
             continue;
         }
         pushQueue(q_waiting, connfd, arrival_time, arrival_time);
-        pthread_mutex_unlock(&m_queues_size);
         pthread_cond_signal(&cond_empty);
+        pthread_mutex_unlock(&m_queues_size);
     }
     deleteQueue(q_waiting);
     deleteQueue(q_handled);

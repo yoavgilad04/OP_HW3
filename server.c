@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
         }
         pushQueue(q_waiting, connfd, arrival_time, arrival_time);
         pthread_mutex_unlock(&m_queues_size);
-        pthread_cond_broadcast(&cond_empty);
+        pthread_cond_signal(&cond_empty);
     }
     deleteQueue(q_waiting);
     deleteQueue(q_handled);

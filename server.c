@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
                     deleteRandHalf(q_waiting);
                 }
             }
-        }
+
         if (to_outer_loop == 1)
         {
             pthread_mutex_unlock(&m_queues_size);

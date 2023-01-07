@@ -157,14 +157,12 @@ int main(int argc, char *argv[])
 
     // create locks and cond_vars
     init_cond_and_locks();
-    int to_outer_loop;
     listenfd = Open_listenfd(port);
     while (1) {
-        to_outer_loop = false;
         clientlen = sizeof(clientaddr);
         connfd = Accept(listenfd, (SA *)&clientaddr, (socklen_t *) &clientlen);
         pthread_mutex_lock(&m_queues_size);
-        while(q_waiting->current_size + q_handled->current_size == max_requests_size){
+        if(q_waiting->current_size + q_handled->current_size == max_requests_size){
             if(q_waiting->current_size == 0){
                 Close(connfd);
                 pthread_mutex_unlock(&m_queues_size);
@@ -177,14 +175,12 @@ int main(int argc, char *argv[])
                 {
                     while(q_waiting->current_size + q_handled->current_size == max_requests_size)
                         pthread_cond_wait(&cond_full, &m_queues_size);
-                    break;
                 }
                     // drop_tail -> should close the fd, and continue to the next iteration of the while(1)
                 else if (strcmp(policy,  'dt'))
                 {
                     Close(connfd);
-                    to_outer_loop = true;
-                    break;
+                    continue;
                 }
                     // drop_head -> execute q_waiting.pop and q_wating.push(new_request)
                 else if (strcmp(policy,  'dh'))
@@ -192,35 +188,21 @@ int main(int argc, char *argv[])
                     Node request = popQueue(q_waiting);
                     Close(request->data);
                     deleteNode(request);
-                    continue;
                 }
                     // drop_random -> q_waiting.deleteRand()
                 else if (strcmp(policy,  'random'))
                 {
                     deleteRandHalf(q_waiting);
-                    continue;
                 }
             }
-        }
-        if(to_outer_loop == true)
-        {
-            pthread_mutex_unlock(&m_queues_size);
-            continue;
         }
         pushQueue(q_waiting, connfd);
         pthread_cond_signal(&cond_empty);
         pthread_mutex_unlock(&m_queues_size);
-
-        // HW3: In general, don't handle the request in the main thread.
-        // Save the relevant info in a buffer and have one of the worker threads
-        // do the work.
-        //
      }
-        deleteQueue(q_waiting);
-        deleteQueue(q_handled);
+    deleteQueue(q_waiting);
+    deleteQueue(q_handled);
     free(pool);
-//    for(int i=0 ; i < num_of_threads; i++)
-//        pthread_cancel(pool[i]);
 }
 
 

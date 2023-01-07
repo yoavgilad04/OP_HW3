@@ -93,7 +93,7 @@ pthread_t* createPool(int num_of_threads, Queue* q_arr)
     for(int i=0; i<num_of_threads; i++)
     {
         args.i = i;
-        pthread_create(pool+i, NULL, thread_routine, (void*)args);
+        pthread_create(pool+i, NULL, thread_routine, (void*)(&args));
     }
     return pool;
 }

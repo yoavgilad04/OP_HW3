@@ -41,6 +41,8 @@ void requestError(int fd, char *cause, char *errnum, char *shortmsg, char *longm
     printf("%s", buf);
 
     addStatsToBuf(buf, arrival_time, handled_time);
+    Rio_writen(fd, buf, strlen(buf));
+
     // Write out the content
     Rio_writen(fd, body, strlen(body));
    printf("%s", body);

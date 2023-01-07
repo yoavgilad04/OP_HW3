@@ -16,7 +16,8 @@ void addStatsToBuf(char* buf , struct timeval arrival_time, struct timeval handl
 
 }
 // requestError(      fd,    filename,        "404",    "Not found", "OS-HW3 Server could not find this file");
-void requestError(int fd, char *cause, char *errnum, char *shortmsg, char *longmsg) 
+void requestError(int fd, char *cause, char *errnum, char *shortmsg, char *longmsg,
+                  struct timeval arrival_time, struct timeval handled_time)
 {
    char buf[MAXLINE], body[MAXBUF];
 
@@ -39,7 +40,7 @@ void requestError(int fd, char *cause, char *errnum, char *shortmsg, char *longm
    sprintf(buf, "Content-Length: %lu\r\n\r\n", strlen(body));
    Rio_writen(fd, buf, strlen(buf));
    printf("%s", buf);
-
+   addStatsToBuf(buf , arrival_time, handled_time);
    // Write out the content
    Rio_writen(fd, body, strlen(body));
    printf("%s", body);

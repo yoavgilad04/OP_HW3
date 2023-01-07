@@ -1,6 +1,8 @@
 #ifndef __REQUEST_H__
 
-void requestHandle(int fd, struct timeval arrival_time, struct timeval handled_time);
+typedef struct stats Stats;
+void requestHandle(int fd, Stats stats);
+
 struct stats{
     struct timeval arrival_time;
     struct timeval handled_time;
@@ -13,8 +15,6 @@ struct stats_thread{
     int count_static;
     int count_dyn;
 };
-
-typedef struct stats Stats;
 
 
 #endif

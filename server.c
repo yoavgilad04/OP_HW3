@@ -15,6 +15,7 @@
 #define false 0
 #define MAX_ALG 7
 // HW3: Parse the new arguments too
+
 void getargs(int *port, int *num_of_threads, int *max_queue_size, char* policy, int argc, char *argv[])
 {
     if (argc < 2) {
@@ -31,60 +32,12 @@ void getargs(int *port, int *num_of_threads, int *max_queue_size, char* policy, 
         strcpy(policy, argv[4]);
 }
 
-/**
- * Conditions:
- * 1) The main thread waits if the number of request is full
- * 2) The threads wait if the number of request is zero
- * 3) If one thread change queue sizes then other threads need to wait for it to finish.
- * 4) If there are no requests in the waiting queue all threads most wait for a request
- */
+
 pthread_cond_t cond_full; //The main thread will wait in this cond in case number of request are maximize
 pthread_cond_t cond_empty; //Worker threads will wait in this cond in case the number of request is zero
 
 pthread_mutex_t m_queues_size;
 
-
-/**
- * נעילת mutex:
-int pthread_mutex_lock(pthread_mutex_t *mutex);
-הפעולה חוסמת עד שה-mutex מתפנה ואז נועלת אותו.
-ניסיון לנעילת mutex:
-int pthread_mutex_trylock(pthread_mutex_t *mutex);
-הפעולה נכשלת אם ה-mutex כבר נעול, אחרת נועלת אותו.
-שחרור mutex נעול:
-int pthread_mutex_unlock(pthread_mutex_t *mutex);
-ניסיון לשחרר מנעול שאינו נעול תביא להתנהגות לא מוגדרת.
-פינוי mutex בתום השימוש:
-int pthread_mutex_destroy(pthread_mutex_t *mutex);
-הפעולה נכשלת אם ה-mutex מאותחל אבל נעול.
- */
-
-/**
- * int pthread_cond_signal(pthread_cond_t *cond);
-משחררת את אחד החוטים הממתינים (הגינות לא מובטחת).
-
- int pthread_cond_wait(pthread_cond_t *cond,
-		pthread_mutex_t *mutex);
-פעולה:
-משחררת את המנעול ומעבירה את החוט להמתין על משתנה התנאי באופן אטומי (ראינו קודם מדוע זה הכרחי).
-החוט הממתין חייב להחזיק במנעול mutex לפני הקריאה.
-בחזרה מהמתנה על משתנה התנאי, החוט עובר להמתין על המנעול. החוט יחזור מהקריאה ל-pthread_cond_wait() רק לאחר שינעל מחדש את ה-mutex.
-
-ערך מוחזר: הפעולה תמיד מצליחה ומחזירה 0.
-
- int pthread_cond_broadcast(pthread_cond_t *cond);
-משחררת את כל החוטים הממתינים.
-כל החוטים מפסיקים להמתין על משתנה התנאי ועוברים להמתין על המנעול. החוטים יחזרו לפעילות בזה אחר זה (בסדר כלשהו, לאו דווקא הוגן) לאחר שינעלו מחדש את ה-mutex.
-
-
- int pthread_cond_init(pthread_cond_t *cond,
-		pthread_condattr_t *cond_attr);
-ערך מוחזר: הפעולה תמיד מצליחה ומחזירה 0.
-
-int pthread_cond_destroy(pthread_cond_t *cond);
-ערך מוחזר: 0 בהצלחה, ערך שונה מ-0 בכישלון (למשל, אם יש עדיין חוטים הממתינים על משתנה התנאי).
-
- */
 
 void init_cond_and_locks(){
     pthread_mutex_init(&m_queues_size, NULL);
@@ -93,6 +46,12 @@ void init_cond_and_locks(){
 }
 
 void* thread_routine(Queue* q_arr) {
+    Stats stats;
+    stats.stat_thread.count = 0;
+    stats.stat_thread.count_static = 0;
+    stats.stat_thread.count_dyn = 0;
+
+    stats.stat_thread.thread_id = pthread_self();
     while(1){
         Queue q_waiting = q_arr[0];
         Queue q_handled = q_arr[1];
@@ -105,13 +64,15 @@ void* thread_routine(Queue* q_arr) {
         if (request == NULL)
             continue;
         int connfd = request->data;
-        struct timeval arrival = request->arrival_time;
+        stats.arrival_time = request->arrival_time;
         struct timeval handle;
         gettimeofday(&handle, NULL);
+        stats.handled_time = handle;
         pushQueue(q_handled, connfd, arrival, handle);
+        stats.stat_thread.count++;
         pthread_mutex_unlock(&m_queues_size);
 
-        requestHandle(connfd, arrival, handle);
+        requestHandle(connfd, stats);
         Close(connfd);
 
         pthread_mutex_lock(&m_queues_size);

@@ -139,13 +139,13 @@ int main(int argc, char *argv[])
         pthread_mutex_lock(&m_queues_size);
         struct timeval arrival_time;
         gettimeofday(&arrival_time, NULL);
-        while(q_waiting->current_size + q_handled->current_size == max_requests_size){
+        if(q_waiting->current_size + q_handled->current_size == max_requests_size){
             if(q_waiting->current_size == 0){
                 Close(connfd);
                 to_outer_loop = 1;
             }
-            else{
-                //Todo: Throwing waited requests algorithm
+            else
+            {
                 // is_block -> stop getting requests and once there is a spot for the request push the new request
                 if (strcmp(policy,  'block') == 0)
                 {

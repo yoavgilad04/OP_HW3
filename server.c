@@ -106,7 +106,7 @@ void* thread_routine(Queue* q_arr) {
         struct timeval arrival = request->arrival_time;
         struct timeval handle;
         gettimeofday(&handle, NULL);
-        pushQueue(q_handled, data, arrival, handle);
+        pushQueue(q_handled, request_num, arrival, handle);
         pthread_mutex_unlock(&m_queues_size);
 
         requestHandle(request);
@@ -201,7 +201,7 @@ int main(int argc, char *argv[])
                 }
             }
         }
-        pushQueue(q_waiting, connfd, arrival_time, NULL);
+        pushQueue(q_waiting, connfd, arrival_time, arrival_time);
         pthread_cond_signal(&cond_empty);
         pthread_mutex_unlock(&m_queues_size);
      }

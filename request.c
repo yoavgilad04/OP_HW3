@@ -7,7 +7,7 @@
 #include <sys/time.h>
 
 
-void addStatsToBuf(char* buf , Stats stats){
+void addStatsToBuf(char* buf , Stats stats, int is_static){
     long dispatch_tv_sec = stats.handled_time.tv_sec - stats.arrival_time.tv_sec;
     long dispatch_tv_usec = stats.handled_time.tv_usec - stats.arrival_time.tv_usec;
 
@@ -16,7 +16,10 @@ void addStatsToBuf(char* buf , Stats stats){
     sprintf(buf, "%sStat-Thread-Id:: %d\r\n", buf, stats.stat_thread.thread_id);
     sprintf(buf, "%sStat-Thread-Count:: %d\r\n", buf, stats.stat_thread.count);
     sprintf(buf, "%sStat-Thread-Static:: %d\r\n", buf, stats.stat_thread.count_static);
-    sprintf(buf, "%sStat-Thread-Dynamic:: %d\r\n\r\n", buf, stats.stat_thread.count_dyn);
+    if(is_static == 1)
+        sprintf(buf, "%sStat-Thread-Dynamic:: %d\r\n", buf, stats.stat_thread.count_dyn);
+    else
+        sprintf(buf, "%sStat-Thread-Dynamic:: %d\r\n\r\n", buf, stats.stat_thread.count_dyn);
 
 
 }
@@ -44,7 +47,7 @@ void requestError(int fd, char *cause, char *errnum, char *shortmsg, char *longm
     Rio_writen(fd, buf, strlen(buf));
     printf("%s", buf);
 
-    addStatsToBuf(buf, stats);
+    addStatsToBuf(buf, stats, 0);
     Rio_writen(fd, buf, strlen(buf));
 
     // Write out the content
@@ -127,7 +130,7 @@ void requestServeDynamic(int fd, char *filename, char *cgiargs, Stats* stats)
    // The CGI script has to finish writing out the header.
    sprintf(buf, "HTTP/1.0 200 OK\r\n");
    sprintf(buf, "%sServer: OS-HW3 Web Server\r\n", buf);
-   addStatsToBuf(buf, *stats);
+   addStatsToBuf(buf, *stats, 0);
    Rio_writen(fd, buf, strlen(buf));
 
    if (Fork() == 0) {
@@ -161,7 +164,7 @@ void requestServeStatic(int fd, char *filename, int filesize, Stats* stats)
    sprintf(buf, "%sServer: OS-HW3 Web Server\r\n", buf);
    sprintf(buf, "%sContent-Length: %d\r\n", buf, filesize);
    sprintf(buf, "%sContent-Type: %s\r\n", buf, filetype);
-   addStatsToBuf(buf, *stats);
+   addStatsToBuf(buf, *stats, 1);
    Rio_writen(fd, buf, strlen(buf));
 
    //  Writes out to the client socket the memory-mapped file 

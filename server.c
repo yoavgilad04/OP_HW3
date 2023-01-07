@@ -139,10 +139,10 @@ int main(int argc, char *argv[])
         pthread_mutex_lock(&m_queues_size);
         struct timeval arrival_time;
         gettimeofday(&arrival_time, NULL);
-        if(q_waiting->current_size + q_handled->current_size == max_requests_size){
+        while(q_waiting->current_size + q_handled->current_size == max_requests_size){
             if(q_waiting->current_size == 0){
                 Close(connfd);
-                to_outer_loop = 1;
+                pthread_cond_wait(&cond_full, &m_queues_size);
             }
             else{
                 //Todo: Throwing waited requests algorithm

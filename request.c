@@ -36,7 +36,7 @@ void requestError(int fd, char *cause, char *errnum, char *shortmsg, char *longm
     Rio_writen(fd, buf, strlen(buf));
     printf("%s", buf);
 
-    sprintf(buf, "Content-Length: %lu\r\n\r\n", strlen(body));
+    sprintf(buf, "Content-Length: %lu\r\n", strlen(body));
     Rio_writen(fd, buf, strlen(buf));
     printf("%s", buf);
 

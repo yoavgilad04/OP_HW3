@@ -102,18 +102,20 @@ void* thread_routine(Queue* q_arr) {
             pthread_cond_wait(&cond_empty, &m_queues_size);
         }
         Node request = popQueue(q_waiting);
-        int request_num = request->data;
+        if (request == NULL)
+            continue;
+        int connfd = request->data;
         struct timeval arrival = request->arrival_time;
         struct timeval handle;
         gettimeofday(&handle, NULL);
-        pushQueue(q_handled, request_num, arrival, handle);
+        pushQueue(q_handled, connfd, arrival, handle);
         pthread_mutex_unlock(&m_queues_size);
 
-        requestHandle(request, arrival, handle);
-        Close(request_num);
+        requestHandle(connfd, arrival, handle);
+        Close(connfd);
 
         pthread_mutex_lock(&m_queues_size);
-        deleteByValue(q_handled, request_num);
+        deleteByValue(q_handled, connfd);
         pthread_mutex_unlock(&m_queues_size);
         pthread_cond_signal(&cond_full);
     }

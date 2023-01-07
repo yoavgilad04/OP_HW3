@@ -10,14 +10,14 @@
 #include <sys/time.h>
 
 
+typedef struct node* Node; //Define node as pointer of data type struct LinkedList
+
 struct node{
     int data;
     struct timeval arrival_time;
     struct timeval handle_time;
     struct Node *next;
 };
-
-typedef struct node* Node; //Define node as pointer of data type struct LinkedList
 
 struct request_list{
     Node head;

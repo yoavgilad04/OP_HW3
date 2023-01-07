@@ -53,9 +53,9 @@ void* thread_routine(struct routine_args* args) {
     stats.stat_thread.count = 0;
     stats.stat_thread.count_static = 0;
     stats.stat_thread.count_dyn = 0;
-    stats.stat_thread.thread_id = args.i;
-    Queue q_waiting = args.q_arr[0];
-    Queue q_handled = args.q_arr[1];
+    stats.stat_thread.thread_id = args->i;
+    Queue q_waiting = args->q_arr[0];
+    Queue q_handled = args->q_arr[1];
     while(1){
         pthread_mutex_lock(&m_queues_size);
 

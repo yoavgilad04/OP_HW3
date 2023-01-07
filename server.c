@@ -68,7 +68,7 @@ void* thread_routine(Queue* q_arr) {
         struct timeval handle;
         gettimeofday(&handle, NULL);
         stats.handled_time = handle;
-        pushQueue(q_handled, connfd, arrival, handle);
+        pushQueue(q_handled, connfd, stats.arrival_time, stats.handled_time);
         stats.stat_thread.count++;
         pthread_mutex_unlock(&m_queues_size);
 

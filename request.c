@@ -17,13 +17,12 @@ void addStatsToBuf(char* buf , Stats stats, int is_static){
     sprintf(buf, "%sStat-Thread-Count:: %d\r\n", buf, stats.stat_thread.count);
     sprintf(buf, "%sStat-Thread-Static:: %d\r\n", buf, stats.stat_thread.count_static);
     if(is_static == 1)
-    {
         sprintf(buf, "%sStat-Thread-Dynamic:: %d\r\n\r\n", buf, stats.stat_thread.count_dyn);
-    }
-    else
-    {
+    if(is_static == 0)
         sprintf(buf, "%sStat-Thread-Dynamic:: %d\r\n\r\n", buf, stats.stat_thread.count_dyn);
-    }
+    if(is_static == 2)
+        sprintf(buf, "%sStat-Thread-Dynamic:: %d\r\n", buf, stats.stat_thread.count_dyn);
+
 
 
 }
@@ -134,7 +133,7 @@ void requestServeDynamic(int fd, char *filename, char *cgiargs, Stats* stats)
    // The CGI script has to finish writing out the header.
    sprintf(buf, "HTTP/1.0 200 OK\r\n");
    sprintf(buf, "%sServer: OS-HW3 Web Server\r\n", buf);
-   addStatsToBuf(buf, *stats, 0);
+   addStatsToBuf(buf, *stats, 2);
    Rio_writen(fd, buf, strlen(buf));
 
    if (Fork() == 0) {

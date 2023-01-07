@@ -4,6 +4,7 @@
 
 #include "segel.h"
 #include "request.h"
+#include <sys/time.h>
 
 // requestError(      fd,    filename,        "404",    "Not found", "OS-HW3 Server could not find this file");
 void requestError(int fd, char *cause, char *errnum, char *shortmsg, char *longmsg) 
@@ -151,7 +152,8 @@ void requestServeStatic(int fd, char *filename, int filesize)
 
 }
 
-void printStats(char* buf, struct timeval arrival_time, struct timeval handled_time){
+void printStats(struct timeval arrival_time, struct timeval handled_time){
+    char buf[MAXLINE];
     long dispatch_tv_sec = handled_time.tv_sec - arrival_time.tv_sec;
     long dispatch_tv_usec = handled_time.tv_usec - arrival_time.tv_usec;
 
@@ -199,7 +201,7 @@ void requestHandle(int fd, struct timeval arrival_time, struct timeval handled_t
       }
       requestServeDynamic(fd, filename, cgiargs);
    }
-   printStats(buf, arrival_time, handled_time);
+   printStats(arrival_time, handled_time);
 }
 
 

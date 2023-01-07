@@ -188,26 +188,26 @@ void requestHandle(int fd, Stats* stats)
    printf("%s %s %s\n", method, uri, version);
 
    if (strcasecmp(method, "GET")) {
-      requestError(fd, method, "501", "Not Implemented", "OS-HW3 Server does not implement this method", stats);
+      requestError(fd, method, "501", "Not Implemented", "OS-HW3 Server does not implement this method", *stats);
       return;
    }
    requestReadhdrs(&rio);
 
    is_static = requestParseURI(uri, filename, cgiargs);
    if (stat(filename, &sbuf) < 0) {
-      requestError(fd, filename, "404", "Not found", "OS-HW3 Server could not find this file", stats);
+      requestError(fd, filename, "404", "Not found", "OS-HW3 Server could not find this file", *stats);
       return;
    }
 
    if (is_static) {
       if (!(S_ISREG(sbuf.st_mode)) || !(S_IRUSR & sbuf.st_mode)) {
-         requestError(fd, filename, "403", "Forbidden", "OS-HW3 Server could not read this file", stats);
+         requestError(fd, filename, "403", "Forbidden", "OS-HW3 Server could not read this file", *stats);
          return;
       }
       requestServeStatic(fd, filename, sbuf.st_size, stats);
    } else {
       if (!(S_ISREG(sbuf.st_mode)) || !(S_IXUSR & sbuf.st_mode)) {
-         requestError(fd, filename, "403", "Forbidden", "OS-HW3 Server could not run this CGI program", stats);
+         requestError(fd, filename, "403", "Forbidden", "OS-HW3 Server could not run this CGI program", *stats);
          return;
       }
       requestServeDynamic(fd, filename, cgiargs, stats);

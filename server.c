@@ -56,7 +56,7 @@ void* thread_routine(struct routine_args* args) {
     stats.stat_thread.count = 0;
     stats.stat_thread.count_static = 0;
     stats.stat_thread.count_dyn = 0;
-    stats.stat_thread.thread_id = *id;
+    stats.stat_thread.thread_id = args->i;
     Queue q_waiting = args->waiting;
     Queue q_handled = args->handling;
     while(1){

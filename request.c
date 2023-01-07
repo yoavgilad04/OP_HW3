@@ -52,7 +52,7 @@ void requestError(int fd, char *cause, char *errnum, char *shortmsg, char *longm
     Rio_writen(fd, buf, strlen(buf));
     printf("%s", buf);
 
-    Rio_writen(fd, buf, strlen(buf));
+    //Rio_writen(fd, buf, strlen(buf));
 
     // Write out the content
     Rio_writen(fd, body, strlen(body));

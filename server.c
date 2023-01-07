@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
     q_waiting = createQueue(max_requests_size);
     q_handled = createQueue(max_requests_size);
     // Create pool threads
-    pthread_t* pool = createPool(num_of_threads, q_waiting, q_handled);
+    pthread_t* pool = createPool(num_of_threads);
 
     // create locks and cond_vars
     init_cond_and_locks();

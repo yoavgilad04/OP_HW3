@@ -145,7 +145,6 @@ int main(int argc, char *argv[])
                 continue;
             }
             else{
-                //Todo: Throwing waited requests algorithm
                 // is_block -> stop getting requests and once there is a spot for the request push the new request
                 if (strcmp(policy,  'block') == 0)
                 {

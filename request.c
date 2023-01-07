@@ -153,7 +153,7 @@ void requestServeStatic(int fd, char *filename, int filesize)
 }
 
 void printStats(struct timeval arrival_time, struct timeval handled_time){
-    char buf[MAXLINE];
+    char buf[MAXBUF];
     long dispatch_tv_sec = handled_time.tv_sec - arrival_time.tv_sec;
     long dispatch_tv_usec = handled_time.tv_usec - arrival_time.tv_usec;
 

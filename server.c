@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
         while(q_waiting->current_size + q_handled->current_size == max_requests_size){
             if(q_waiting->current_size == 0){
                 Close(connfd);
-                pthread_cond_wait(&cond_full, &m_queues_size);
+                to_outer_loop = 1;
             }
             else{
                 //Todo: Throwing waited requests algorithm
@@ -174,6 +174,7 @@ int main(int argc, char *argv[])
         }
         if (to_outer_loop == 1)
         {
+            to_outer_loop = 0;
             pthread_mutex_unlock(&m_queues_size);
             continue;
         }

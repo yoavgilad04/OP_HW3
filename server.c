@@ -48,7 +48,7 @@ void init_cond_and_locks(){
     pthread_cond_init(&cond_empty, NULL);
 }
 
-void* thread_routine(struct routine_args args) {
+void* thread_routine(struct routine_args* args) {
     Stats stats;
     stats.stat_thread.count = 0;
     stats.stat_thread.count_static = 0;

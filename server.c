@@ -15,6 +15,9 @@
 #define false 0
 #define MAX_ALG 7
 // HW3: Parse the new arguments too
+
+Queue q_waiting;
+Queue q_handled;
 struct routine_args{
     Queue waiting;
     Queue handling;
@@ -49,14 +52,12 @@ void init_cond_and_locks(){
     pthread_cond_init(&cond_empty, NULL);
 }
 
-void* thread_routine(struct routine_args* args) {
+void* thread_routine(int* id) {
     Stats stats;
     stats.stat_thread.count = 0;
     stats.stat_thread.count_static = 0;
     stats.stat_thread.count_dyn = 0;
-    stats.stat_thread.thread_id = args->i;
-    Queue q_waiting = args->waiting;
-    Queue q_handled = args->handling;
+    stats.stat_thread.thread_id = *id;
     while(1){
         pthread_mutex_lock(&m_queues_size);
 
@@ -86,16 +87,14 @@ void* thread_routine(struct routine_args* args) {
 
 }
 
-pthread_t* createPool(int num_of_threads, Queue waiting, Queue handling)
+pthread_t* createPool(int num_of_threads)
 {
     pthread_t *pool = (pthread_t*)malloc(sizeof(*pool)*num_of_threads);
-    struct routine_args args;
-    args.waiting = waiting;
-    args. handling = handling;
+    int* thread_id =(int*)malloc(num_of_threads*sizeof(thread_id));
     for(int i=0; i<num_of_threads; i++)
     {
-        args.i = i;
-        pthread_create(pool+i, NULL, thread_routine, (void*)(&args));
+        thread_id[i] = i;
+        pthread_create(pool+i, NULL, thread_routine, (void*)(&thread_id[i]));
     }
     return pool;
 }
@@ -122,8 +121,8 @@ int main(int argc, char *argv[])
 
     getargs(&port,&num_of_threads, &max_requests_size, policy, argc, argv);
     // Creating queues
-    Queue q_waiting = createQueue(max_requests_size);
-    Queue q_handled = createQueue(max_requests_size);
+    q_waiting = createQueue(max_requests_size);
+    q_handled = createQueue(max_requests_size);
     // Create pool threads
     pthread_t* pool = createPool(num_of_threads, q_waiting, q_handled);
 

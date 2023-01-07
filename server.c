@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
         struct timeval arrival_time;
         gettimeofday(&arrival_time, NULL);
         if(q_waiting->current_size + q_handled->current_size == max_requests_size){
-            while(q_waiting->current_size == 0){
+            if(q_waiting->current_size == 0){
                 Close(connfd);
                 pthread_mutex_unlock(&m_queues_size);
                 continue;

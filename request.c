@@ -20,8 +20,10 @@ void requestError(int fd, char *cause, char *errnum, char *shortmsg, char *longm
                   struct timeval arrival_time, struct timeval handled_time)
 {
    char buf[MAXLINE], body[MAXBUF];
+   long dispatch_tv_sec = handled_time.tv_sec - arrival_time.tv_sec;
+   long dispatch_tv_usec = handled_time.tv_usec - arrival_time.tv_usec;
 
-   // Create the body of the error message
+    // Create the body of the error message
    sprintf(body, "<html><title>OS-HW3 Error</title>");
    sprintf(body, "%s<body bgcolor=""fffff"">\r\n", body);
    sprintf(body, "%s%s: %s\r\n", body, errnum, shortmsg);
@@ -40,7 +42,15 @@ void requestError(int fd, char *cause, char *errnum, char *shortmsg, char *longm
    sprintf(buf, "Content-Length: %lu\r\n\r\n", strlen(body));
    Rio_writen(fd, buf, strlen(buf));
    printf("%s", buf);
-   addStatsToBuf(buf , arrival_time, handled_time);
+
+   sprintf(buf, "%sStat-Req-Arrival:: %lu.%06lu\r\n", buf, arrival_time.tv_sec, arrival_time.tv_usec);
+   Rio_writen(fd, buf, strlen(buf));
+   printf("%s", buf);
+
+   sprintf(buf, "%sStat-Req-Dispatch:: %lu.%06lu\r\n", buf, dispatch_tv_sec, dispatch_tv_usec);
+   Rio_writen(fd, buf, strlen(buf));
+   printf("%s", buf);
+
    // Write out the content
    Rio_writen(fd, body, strlen(body));
    printf("%s", body);

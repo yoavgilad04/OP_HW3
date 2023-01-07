@@ -1,7 +1,7 @@
 #ifndef __REQUEST_H__
 
 typedef struct stats Stats;
-void requestHandle(int fd, Stats stats);
+void requestHandle(int fd, Stats* stats);
 
 struct stats_thread{
     int thread_id;

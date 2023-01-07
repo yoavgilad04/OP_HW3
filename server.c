@@ -72,7 +72,7 @@ void* thread_routine(Queue* q_arr) {
         stats.stat_thread.count++;
         pthread_mutex_unlock(&m_queues_size);
 
-        requestHandle(connfd, stats);
+        requestHandle(connfd, &stats);
         Close(connfd);
 
         pthread_mutex_lock(&m_queues_size);

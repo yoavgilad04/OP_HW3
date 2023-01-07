@@ -118,16 +118,16 @@ void requestGetFiletype(char *filename, char *filetype)
       strcpy(filetype, "text/plain");
 }
 
-void requestServeDynamic(int fd, char *filename, char *cgiargs, Stats stats)
+void requestServeDynamic(int fd, char *filename, char *cgiargs, Stats* stats)
 {
-    stats.stat_thread.count_dyn++;
+    stats->stat_thread.count_dyn++;
     char buf[MAXLINE], *emptylist[] = {NULL};
 
    // The server does only a little bit of the header.  
    // The CGI script has to finish writing out the header.
    sprintf(buf, "HTTP/1.0 200 OK\r\n");
    sprintf(buf, "%sServer: OS-HW3 Web Server\r\n", buf);
-   addStatsToBuf(buf, stats);
+   addStatsToBuf(buf, *stats);
    Rio_writen(fd, buf, strlen(buf));
 
    if (Fork() == 0) {
@@ -141,9 +141,9 @@ void requestServeDynamic(int fd, char *filename, char *cgiargs, Stats stats)
 }
 
 
-void requestServeStatic(int fd, char *filename, int filesize, Stats stats)
+void requestServeStatic(int fd, char *filename, int filesize, Stats* stats)
 {
-    stats.stat_thread.count_static++;
+   stats->stat_thread.count_static++;
    int srcfd;
    char *srcp, filetype[MAXLINE], buf[MAXBUF];
 
@@ -161,7 +161,7 @@ void requestServeStatic(int fd, char *filename, int filesize, Stats stats)
    sprintf(buf, "%sServer: OS-HW3 Web Server\r\n", buf);
    sprintf(buf, "%sContent-Length: %d\r\n", buf, filesize);
    sprintf(buf, "%sContent-Type: %s\r\n\r\n", buf, filetype);
-   addStatsToBuf(buf, stats);
+   addStatsToBuf(buf, *stats);
    Rio_writen(fd, buf, strlen(buf));
 
    //  Writes out to the client socket the memory-mapped file 
@@ -173,7 +173,7 @@ void requestServeStatic(int fd, char *filename, int filesize, Stats stats)
 
 
 // handle a request
-void requestHandle(int fd, Stats stats)
+void requestHandle(int fd, Stats* stats)
 {
    int is_static;
    struct stat sbuf;

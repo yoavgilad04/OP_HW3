@@ -41,7 +41,6 @@ void getargs(int *port, int *num_of_threads, int *max_queue_size, char* policy, 
 pthread_cond_t cond_full; //The main thread will wait in this cond in case number of request are maximize
 pthread_cond_t cond_empty; //Worker threads will wait in this cond in case the number of request is zero
 
-
 pthread_mutex_t m_queues_size;
 
 
@@ -102,15 +101,19 @@ void* thread_routine(Queue* q_arr) {
         while (q_waiting->current_size == 0) {
             pthread_cond_wait(&cond_empty, &m_queues_size);
         }
-        int request = popQueue(q_waiting)->data;
-        pushQueue(q_handled, request);
+        Node request = popQueue(q_waiting);
+        int request_num = request->data;
+        struct timeval arrival = request->arrival_time;
+        struct timeval handle;
+        gettimeofday(&handle, NULL);
+        pushQueue(q_handled, data, arrival, handle);
         pthread_mutex_unlock(&m_queues_size);
 
         requestHandle(request);
-        Close(request);
+        Close(request_num);
 
         pthread_mutex_lock(&m_queues_size);
-        deleteByValue(q_handled, request);
+        deleteByValue(q_handled, request_num);
         pthread_mutex_unlock(&m_queues_size);
         pthread_cond_signal(&cond_full);
     }
@@ -162,6 +165,8 @@ int main(int argc, char *argv[])
         clientlen = sizeof(clientaddr);
         connfd = Accept(listenfd, (SA *)&clientaddr, (socklen_t *) &clientlen);
         pthread_mutex_lock(&m_queues_size);
+        struct timeval arrival_time;
+        gettimeofday(&arrival_time, NULL);
         if(q_waiting->current_size + q_handled->current_size == max_requests_size){
             if(q_waiting->current_size == 0){
                 Close(connfd);
@@ -196,7 +201,7 @@ int main(int argc, char *argv[])
                 }
             }
         }
-        pushQueue(q_waiting, connfd);
+        pushQueue(q_waiting, connfd, arrival_time, NULL);
         pthread_cond_signal(&cond_empty);
         pthread_mutex_unlock(&m_queues_size);
      }

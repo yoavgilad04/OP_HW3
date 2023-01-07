@@ -151,10 +151,17 @@ void requestServeStatic(int fd, char *filename, int filesize)
 
 }
 
-// handle a request
-void requestHandle(int fd)
-{
+void printStats(struct timeval arrival_time, struct timeval handled_time){
+    long dispatch_tv_sec = handled_time.tv_sec - arrival_time.tv_sec;
+    long dispatch_tv_usec = handled_time.tv_usec - arrival_time.tv_usec;
 
+    sprintf(buf, "%sStat-Req-Arrival:: %lu.%06lu\r\n", buf, arrival_time.tv_sec, arrival_time.tv_usec);
+    sprintf(buf, "%sStat-Req-Dispatch:: %lu.%06lu\r\n", buf, dispatch_tv_sec, dispatch_tv_usec);
+
+}
+// handle a request
+void requestHandle(int fd, struct timeval arrival_time, struct timeval handled_time)
+{
    int is_static;
    struct stat sbuf;
    char buf[MAXLINE], method[MAXLINE], uri[MAXLINE], version[MAXLINE];
@@ -192,6 +199,9 @@ void requestHandle(int fd)
       }
       requestServeDynamic(fd, filename, cgiargs);
    }
+   printStats(arrival_time, handled_time);
 }
+
+
 
 

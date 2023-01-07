@@ -7,10 +7,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 
 struct node{
     int data;
+    struct timeval arrival_time;
+    struct timeval handle_time;
     struct Node *next;
 };
 
@@ -24,10 +27,12 @@ struct request_list{
 
 typedef struct request_list* Queue; //Define node as pointer of data type struct LinkedList
 
-Node createNode(int value){
+Node createNode(int value, struct timeval arrival, struct timeval handle){
     Node temp; // declare a node
     temp = (Node)malloc(sizeof(struct node)); // allocate memory using malloc()
     temp->data = value;
+    temp->arrival_time = arrival;
+    temp->handle_time = handle;
     temp->next = NULL;// make next point to NULL
     return temp;//return the new node
 }
@@ -71,8 +76,8 @@ void deleteQueue(Queue q)
     free(q);
 }
 
-void pushQueue(Queue requests, int value){
-    Node temp = createNode(value);
+void pushQueue(Queue requests, int value, struct timeval arrival, struct timeval handle){
+    Node temp = createNode(value, arrival, handle);
     Node p = NULL;
     if(requests->head == NULL){
         requests->head = temp;     //when linked list is empty

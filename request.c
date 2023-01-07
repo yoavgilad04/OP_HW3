@@ -7,12 +7,12 @@
 #include <sys/time.h>
 
 
-void addStatsToBuf(char** buf , struct timeval arrival_time, struct timeval handled_time){
+void addStatsToBuf(char* buf , struct timeval arrival_time, struct timeval handled_time){
     long dispatch_tv_sec = handled_time.tv_sec - arrival_time.tv_sec;
     long dispatch_tv_usec = handled_time.tv_usec - arrival_time.tv_usec;
 
-    sprintf(*buf, "%sStat-Req-Arrival:: %lu.%06lu\r\n", *buf, arrival_time.tv_sec, arrival_time.tv_usec);
-    sprintf(*buf, "%sStat-Req-Dispatch:: %lu.%06lu\r\n", *buf, dispatch_tv_sec, dispatch_tv_usec);
+    sprintf(buf, "%sStat-Req-Arrival:: %lu.%06lu\r\n", buf, arrival_time.tv_sec, arrival_time.tv_usec);
+    sprintf(buf, "%sStat-Req-Dispatch:: %lu.%06lu\r\n", buf, dispatch_tv_sec, dispatch_tv_usec);
 
 }
 // requestError(      fd,    filename,        "404",    "Not found", "OS-HW3 Server could not find this file");

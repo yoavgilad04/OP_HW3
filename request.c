@@ -17,7 +17,7 @@ void addStatsToBuf(char* buf , Stats stats, int is_static){
     sprintf(buf, "%sStat-Thread-Count:: %d\r\n", buf, stats.stat_thread.count);
     sprintf(buf, "%sStat-Thread-Static:: %d\r\n", buf, stats.stat_thread.count_static);
     if(is_static == 1)
-        sprintf(buf, "%sStat-Thread-Dynamic:: %d\r\n", buf, stats.stat_thread.count_dyn);
+        sprintf(buf, "%sStat-Thread-Dynamic:: %d\r\n\r\n", buf, stats.stat_thread.count_dyn);
     else
         sprintf(buf, "%sStat-Thread-Dynamic:: %d\r\n\r\n", buf, stats.stat_thread.count_dyn);
 

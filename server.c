@@ -131,7 +131,6 @@ int main(int argc, char *argv[])
 
     // create locks and cond_vars
     init_cond_and_locks();
-    int to_outer_loop = 0;
     listenfd = Open_listenfd(port);
     while (1) {
         clientlen = sizeof(clientaddr);
@@ -142,10 +141,11 @@ int main(int argc, char *argv[])
         if(q_waiting->current_size + q_handled->current_size == max_requests_size){
             if(q_waiting->current_size == 0){
                 Close(connfd);
-                to_outer_loop = 1;
+                pthread_mutex_unlock(&m_queues_size);
+                continue;
             }
-            else
-            {
+            else{
+                //Todo: Throwing waited requests algorithm
                 // is_block -> stop getting requests and once there is a spot for the request push the new request
                 if (strcmp(policy,  'block') == 0)
                 {
@@ -156,7 +156,8 @@ int main(int argc, char *argv[])
                 else if (strcmp(policy,  'dt') == 0)
                 {
                     Close(connfd);
-                    to_outer_loop = 1;
+                    pthread_mutex_unlock(&m_queues_size);
+                    continue;
                 }
                     // drop_head -> execute q_waiting.pop and q_wating.push(new_request)
                 else if (strcmp(policy,  'dh') == 0)
@@ -171,12 +172,6 @@ int main(int argc, char *argv[])
                     deleteRandHalf(q_waiting);
                 }
             }
-        }
-        if (to_outer_loop == 1)
-        {
-            to_outer_loop = 0;
-            pthread_mutex_unlock(&m_queues_size);
-            continue;
         }
         pushQueue(q_waiting, connfd, arrival_time, arrival_time);
         pthread_mutex_unlock(&m_queues_size);

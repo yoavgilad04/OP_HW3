@@ -151,7 +151,7 @@ void requestServeStatic(int fd, char *filename, int filesize)
 
 }
 
-void printStats(struct timeval arrival_time, struct timeval handled_time){
+void printStats(char* buf, struct timeval arrival_time, struct timeval handled_time){
     long dispatch_tv_sec = handled_time.tv_sec - arrival_time.tv_sec;
     long dispatch_tv_usec = handled_time.tv_usec - arrival_time.tv_usec;
 
@@ -199,7 +199,7 @@ void requestHandle(int fd, struct timeval arrival_time, struct timeval handled_t
       }
       requestServeDynamic(fd, filename, cgiargs);
    }
-   printStats(arrival_time, handled_time);
+   printStats(buf, arrival_time, handled_time);
 }
 
 

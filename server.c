@@ -156,6 +156,7 @@ int main(int argc, char *argv[])
                 else if (strcmp(policy,  "dt") == 0)
                 {
                     Close(connfd);
+                    pthread_cond_signal(&cond_empty);
                     pthread_mutex_unlock(&m_queues_size);
                     continue;
                 }

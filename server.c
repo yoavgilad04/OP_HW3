@@ -135,9 +135,9 @@ int main(int argc, char *argv[])
     while (1) {
         clientlen = sizeof(clientaddr);
         connfd = Accept(listenfd, (SA *)&clientaddr, (socklen_t *) &clientlen);
-        pthread_mutex_lock(&m_queues_size);
         struct timeval arrival_time;
         gettimeofday(&arrival_time, NULL);
+        pthread_mutex_lock(&m_queues_size);
         if(q_waiting->current_size + q_handled->current_size >= max_requests_size){
             if(q_waiting->current_size == 0){
                 Close(connfd);

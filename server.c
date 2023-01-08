@@ -24,12 +24,12 @@ struct routine_args{
 
 void getargs(int *port, int *num_of_threads, int *max_queue_size, char* policy, int argc, char *argv[])
 {
-    if (argc < 2) {
-	fprintf(stderr, "Usage: %s <port>\n", argv[0]);
-	exit(1);
-    }
+
     if (argc < 5)
+    {
         fprintf(stderr, "Usage: %s <port> <threads> <queues_size> <schedalg>\n", argv[0]);
+        exit(1);
+    }
     *port = atoi(argv[1]);
     *num_of_threads = atoi(argv[2]);
     *max_queue_size = atoi(argv[3]);
@@ -39,7 +39,6 @@ void getargs(int *port, int *num_of_threads, int *max_queue_size, char* policy, 
 
 pthread_cond_t cond_full; //The main thread will wait in this cond in case number of request are maximize
 pthread_cond_t cond_empty; //Worker threads will wait in this cond in case the number of request is zero
-
 pthread_mutex_t m_queues_size;
 
 
@@ -47,6 +46,7 @@ void init_cond_and_locks(){
     pthread_mutex_init(&m_queues_size, NULL);
     pthread_cond_init(&cond_full, NULL);
     pthread_cond_init(&cond_empty, NULL);
+    return;
 }
 
 void* thread_routine(struct routine_args* args) {
@@ -126,11 +126,11 @@ int main(int argc, char *argv[])
     // Creating queues
     Queue q_waiting = createQueue(max_requests_size);
     Queue q_handled = createQueue(max_requests_size);
+    // create locks and cond_vars
+    init_cond_and_locks();
     // Create pool threads
     pthread_t* pool = createPool(num_of_threads, q_waiting, q_handled);
 
-    // create locks and cond_vars
-    init_cond_and_locks();
     listenfd = Open_listenfd(port);
     while (1) {
         clientlen = sizeof(clientaddr);

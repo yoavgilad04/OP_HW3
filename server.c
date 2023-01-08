@@ -74,7 +74,7 @@ void* thread_routine(struct routine_args* args) {
         struct timeval handle;
         gettimeofday(&handle, NULL);
         stats.handled_time = handle;
-        pushQueue(q_handled, connfd, stats.arrival_time, stats.handled_time);
+        pushQueue(q_handled, connfd, stats.arrival_time);
         stats.stat_thread.count++;
         pthread_mutex_unlock(&m_queues_size);
 
@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
                 }
             }
         }
-        pushQueue(q_waiting, connfd, arrival_time, arrival_time);
+        pushQueue(q_waiting, connfd, arrival_time);
         pthread_cond_signal(&cond_empty);
         pthread_mutex_unlock(&m_queues_size);
     }

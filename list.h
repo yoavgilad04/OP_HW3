@@ -15,7 +15,6 @@ typedef struct node* Node; //Define node as pointer of data type struct LinkedLi
 struct node{
     int data;
     struct timeval arrival_time;
-    struct timeval handle_time;
     Node next;
 };
 
@@ -27,12 +26,11 @@ struct request_list{
 
 typedef struct request_list* Queue; //Define node as pointer of data type struct LinkedList
 
-Node createNode(int value, struct timeval arrival, struct timeval handle){
+Node createNode(int value, struct timeval arrival){
     Node temp; // declare a node
-    temp = (Node)malloc(sizeof(struct node)); // allocate memory using malloc()
+    temp = (Node)malloc(sizeof(*temp)); // allocate memory using malloc()
     temp->data = value;
     temp->arrival_time = arrival;
-    temp->handle_time = handle;
     temp->next = NULL;// make next point to NULL
     return temp;//return the new node
 }
@@ -98,15 +96,16 @@ Node PopByPosition(Queue requests, int position)
     int count = 0;
     Node pre = NULL;
     Node p = NULL;
+    if (requests->current_size < position)
+        return NULL;
     if(requests->head == NULL){
         return NULL;    //when linked list is empty
     }
     else {
         p = requests->head;//assign head to p
-        if (count == position)
+        if (position == 0)
         {
             p = popQueue(requests);
-            requests->current_size--;
             return p;
         }
         while (p->next != NULL) {
@@ -135,7 +134,6 @@ int deleteByValue(Queue requests, int value)
         if (p->data == value)
         {
             deleteNode(popQueue(requests));
-            requests->current_size--;
         }
         while (p->next != NULL) {
             pre = p;

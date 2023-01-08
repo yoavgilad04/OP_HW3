@@ -182,7 +182,7 @@ void requestHandle(int fd, Stats* stats)
     struct timeval handle;
     gettimeofday(&handle, NULL);
     stats->handled_time = handle;
-    stats->stat_thread.count++;
+//    stats->stat_thread.count++;
     int is_static;
    struct stat sbuf;
    char buf[MAXLINE], method[MAXLINE], uri[MAXLINE], version[MAXLINE];

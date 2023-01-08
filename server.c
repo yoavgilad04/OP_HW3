@@ -75,6 +75,7 @@ void* thread_routine(struct routine_args* args) {
 
         requestHandle(connfd, &stats);
         Close(connfd);
+        stats.stat_thread.count++;
 
         pthread_mutex_lock(&m_queues_size);
         deleteByValue(q_handled, connfd);

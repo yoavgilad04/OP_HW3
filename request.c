@@ -10,14 +10,13 @@
 void addStatsToBuf(char* buf , Stats stats, int is_double_space){
     if (stats.handled_time.tv_usec < stats.arrival_time.tv_usec)
     {
-        long dispatch_tv_usec = (stats.handled_time.tv_usec + 1000000) - stats.arrival_time.tv_sec;
+        long dispatch_tv_usec = (stats.handled_time.tv_usec + 1000000) - stats.arrival_time.tv_usec;
         long dispatch_tv_sec = stats.handled_time.tv_sec - stats.arrival_time.tv_sec - 1;
     }
     else
     {
         long dispatch_tv_sec = stats.handled_time.tv_sec - stats.arrival_time.tv_sec;
         long dispatch_tv_usec = stats.handled_time.tv_usec - stats.arrival_time.tv_usec;
-
     }
 
     sprintf(buf, "%sStat-Req-Arrival:: %lu.%06lu\r\n", buf, stats.arrival_time.tv_sec, stats.arrival_time.tv_usec);

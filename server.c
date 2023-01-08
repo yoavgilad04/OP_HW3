@@ -168,7 +168,6 @@ int main(int argc, char *argv[])
                     // drop_random -> q_waiting.deleteRand()
                 else if (strcmp(policy,  "random") == 0)
                 {
-                    return 0;
                     deleteRandHalf(q_waiting);
                 }
             }

@@ -75,7 +75,7 @@ void* thread_routine(struct routine_args* args) {
         pushQueue(q_handled, connfd, stats.arrival_time);
         pthread_mutex_unlock(&m_queues_size);
 
-        stats->handled_time = handle;
+        stats.handled_time = handle;
         stats.stat_thread.count++;
         requestHandle(connfd, &stats);
         Close(connfd);

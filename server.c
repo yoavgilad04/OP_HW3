@@ -167,11 +167,12 @@ int main(int argc, char *argv[])
                     Close(request->data);
                     deleteNode(request);
                 }
-//                    // drop_random -> q_waiting.deleteRand()
-//                else if (strcmp(policy,  "random") == 0)
-//                {
-//                    deleteRandHalf(q_waiting);
-//                }
+                    // drop_random -> q_waiting.deleteRand()
+                else if (strcmp(policy,  "random") == 0)
+                {
+                    return 0;
+                    deleteRandHalf(q_waiting);
+                }
             }
         }
         pushQueue(q_waiting, connfd, arrival_time);

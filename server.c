@@ -62,6 +62,8 @@ void* thread_routine(struct routine_args* args) {
         while (q_waiting->current_size <= 0) {
             pthread_cond_wait(&cond_empty, &m_queues_size);
         }
+        struct timeval handle;
+        gettimeofday(&handle, NULL);
         Node request = popQueue(q_waiting);
         if (request == NULL)
         {
@@ -73,9 +75,10 @@ void* thread_routine(struct routine_args* args) {
         pushQueue(q_handled, connfd, stats.arrival_time);
         pthread_mutex_unlock(&m_queues_size);
 
+        stats->handled_time = handle;
+        stats.stat_thread.count++;
         requestHandle(connfd, &stats);
         Close(connfd);
-        stats.stat_thread.count++;
 
         pthread_mutex_lock(&m_queues_size);
         deleteByValue(q_handled, connfd);
@@ -131,8 +134,8 @@ int main(int argc, char *argv[])
     listenfd = Open_listenfd(port);
     while (1) {
         clientlen = sizeof(clientaddr);
-        connfd = Accept(listenfd, (SA *)&clientaddr, (socklen_t *) &clientlen);
         struct timeval arrival_time;
+        connfd = Accept(listenfd, (SA *)&clientaddr, (socklen_t *) &clientlen);
         gettimeofday(&arrival_time, NULL);
         pthread_mutex_lock(&m_queues_size);
         if(q_waiting->current_size + q_handled->current_size >= max_requests_size){

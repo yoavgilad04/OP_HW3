@@ -7,7 +7,7 @@
 #include <sys/time.h>
 
 
-void addStatsToBuf(char* buf , Stats stats, int is_static){
+void addStatsToBuf(char* buf , Stats stats, int is_double_space){
     long dispatch_tv_sec = stats.handled_time.tv_sec - stats.arrival_time.tv_sec;
     long dispatch_tv_usec = stats.handled_time.tv_usec - stats.arrival_time.tv_usec;
 
@@ -16,11 +16,9 @@ void addStatsToBuf(char* buf , Stats stats, int is_static){
     sprintf(buf, "%sStat-Thread-Id:: %d\r\n", buf, stats.stat_thread.thread_id);
     sprintf(buf, "%sStat-Thread-Count:: %d\r\n", buf, stats.stat_thread.count);
     sprintf(buf, "%sStat-Thread-Static:: %d\r\n", buf, stats.stat_thread.count_static);
-    if(is_static == 1)
+    if(is_double_space == 1)
         sprintf(buf, "%sStat-Thread-Dynamic:: %d\r\n\r\n", buf, stats.stat_thread.count_dyn);
-    if(is_static == 0)
-        sprintf(buf, "%sStat-Thread-Dynamic:: %d\r\n\r\n", buf, stats.stat_thread.count_dyn);
-    if(is_static == 2)
+    if(is_double_space == 0)
         sprintf(buf, "%sStat-Thread-Dynamic:: %d\r\n", buf, stats.stat_thread.count_dyn);
 
 
@@ -47,7 +45,7 @@ void requestError(int fd, char *cause, char *errnum, char *shortmsg, char *longm
     printf("%s", buf);
 
     sprintf(buf, "Content-Length: %lu\r\n", strlen(body));
-    addStatsToBuf(buf, stats, 0);
+    addStatsToBuf(buf, stats, 1);
     Rio_writen(fd, buf, strlen(buf));
     printf("%s", buf);
 
@@ -133,7 +131,7 @@ void requestServeDynamic(int fd, char *filename, char *cgiargs, Stats* stats)
    // The CGI script has to finish writing out the header.
    sprintf(buf, "HTTP/1.0 200 OK\r\n");
    sprintf(buf, "%sServer: OS-HW3 Web Server\r\n", buf);
-   addStatsToBuf(buf, *stats, 2);
+   addStatsToBuf(buf, *stats, 0);
    Rio_writen(fd, buf, strlen(buf));
 
    if (Fork() == 0) {

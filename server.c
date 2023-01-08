@@ -62,12 +62,15 @@ void* thread_routine(struct routine_args* args) {
     while(1){
         pthread_mutex_lock(&m_queues_size);
 
-        while (q_waiting->current_size == 0) {
+        while (q_waiting->current_size <= 0) {
             pthread_cond_wait(&cond_empty, &m_queues_size);
         }
         Node request = popQueue(q_waiting);
         if (request == NULL)
+        {
+            pthread_mutex_unlock(&m_queues_size);
             continue;
+        }
         int connfd = request->data;
         stats.arrival_time = request->arrival_time;
         struct timeval handle;

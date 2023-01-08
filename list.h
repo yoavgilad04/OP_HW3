@@ -74,8 +74,8 @@ void deleteQueue(Queue q)
     free(q);
 }
 
-void pushQueue(Queue requests, int value, struct timeval arrival, struct timeval handle){
-    Node temp = createNode(value, arrival, handle);
+void pushQueue(Queue requests, int value, struct timeval arrival){
+    Node temp = createNode(value, arrival);
     Node p = NULL;
     if(requests->head == NULL){
         requests->head = temp;     //when linked list is empty

@@ -16,7 +16,7 @@ struct node{
     int data;
     struct timeval arrival_time;
     struct timeval handle_time;
-    struct Node *next;
+    struct Node next;
 };
 
 struct request_list{

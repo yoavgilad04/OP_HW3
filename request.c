@@ -179,7 +179,11 @@ void requestServeStatic(int fd, char *filename, int filesize, Stats* stats)
 // handle a request
 void requestHandle(int fd, Stats* stats)
 {
-   int is_static;
+    struct timeval handle;
+    gettimeofday(&handle, NULL);
+    stats->handled_time = handle;
+    stats->stat_thread.count++;
+    int is_static;
    struct stat sbuf;
    char buf[MAXLINE], method[MAXLINE], uri[MAXLINE], version[MAXLINE];
    char filename[MAXLINE], cgiargs[MAXLINE];

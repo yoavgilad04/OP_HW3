@@ -70,11 +70,7 @@ void* thread_routine(struct routine_args* args) {
         }
         int connfd = request->data;
         stats.arrival_time = request->arrival_time;
-        struct timeval handle;
-        gettimeofday(&handle, NULL);
-        stats.handled_time = handle;
         pushQueue(q_handled, connfd, stats.arrival_time);
-        stats.stat_thread.count++;
         pthread_mutex_unlock(&m_queues_size);
 
         requestHandle(connfd, &stats);

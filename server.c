@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
         pthread_mutex_lock(&m_queues_size);
         struct timeval arrival_time;
         gettimeofday(&arrival_time, NULL);
-        if(q_waiting->current_size + q_handled->current_size == max_requests_size){
+        if(q_waiting->current_size + q_handled->current_size >= max_requests_size){
             if(q_waiting->current_size == 0){
                 Close(connfd);
                 pthread_mutex_unlock(&m_queues_size);
@@ -146,35 +146,35 @@ int main(int argc, char *argv[])
             }
             else{
                 // is_block -> stop getting requests and once there is a spot for the request push the new request
-                if (strcmp(policy,  'block') == 0)
+                if (strcmp(policy,  "block") == 0)
                 {
-                    while(q_waiting->current_size + q_handled->current_size == max_requests_size)
+                    while(q_waiting->current_size + q_handled->current_size >= max_requests_size)
                         pthread_cond_wait(&cond_full, &m_queues_size);
                 }
                     // drop_tail -> should close the fd, and continue to the next iteration of the while(1)
-                else if (strcmp(policy,  'dt') == 0)
+                else if (strcmp(policy,  "dt") == 0)
                 {
                     Close(connfd);
                     pthread_mutex_unlock(&m_queues_size);
                     continue;
                 }
                     // drop_head -> execute q_waiting.pop and q_wating.push(new_request)
-                else if (strcmp(policy,  'dh') == 0)
+                else if (strcmp(policy,  "dh") == 0)
                 {
                     Node request = popQueue(q_waiting);
                     Close(request->data);
                     deleteNode(request);
                 }
                     // drop_random -> q_waiting.deleteRand()
-                else if (strcmp(policy,  'random') == 0)
+                else if (strcmp(policy,  "random") == 0)
                 {
                     deleteRandHalf(q_waiting);
                 }
             }
         }
         pushQueue(q_waiting, connfd, arrival_time, arrival_time);
-        pthread_mutex_unlock(&m_queues_size);
         pthread_cond_signal(&cond_empty);
+        pthread_mutex_unlock(&m_queues_size);
     }
     deleteQueue(q_waiting);
     deleteQueue(q_handled);

@@ -133,7 +133,6 @@ int main(int argc, char *argv[])
     init_cond_and_locks();
     listenfd = Open_listenfd(port);
     while (1) {
-        pthread_mutex_unlock(&m_queues_size);
         clientlen = sizeof(clientaddr);
         connfd = Accept(listenfd, (SA *)&clientaddr, (socklen_t *) &clientlen);
         pthread_mutex_lock(&m_queues_size);
@@ -156,7 +155,6 @@ int main(int argc, char *argv[])
                 else if (strcmp(policy,  "dt") == 0)
                 {
                     Close(connfd);
-                    pthread_cond_signal(&cond_empty);
                     pthread_mutex_unlock(&m_queues_size);
                     continue;
                 }

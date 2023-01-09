@@ -151,10 +151,10 @@ void requestServeDynamic(int fd, char *filename, char *cgiargs, Stats* stats)
         Dup2(fd, STDOUT_FILENO);
         Execve(filename, emptylist, environ);
     }
-//    WaitPid(pid, NULL, 0);
-    printf("reached to NuLL with thread_father: %d son_pid: %d count: %d", stats->stat_thread.thread_id,
-           pid, stats->stat_thread.count);
-    Wait(NULL);
+    WaitPid(pid, NULL, 0);
+//    printf("reached to NuLL with thread_father: %d son_pid: %d count: %d", stats->stat_thread.thread_id,
+//           pid, stats->stat_thread.count);
+//    Wait(NULL);
 }
 
 

@@ -66,16 +66,17 @@ void* thread_routine(struct routine_args* args) {
         Node request = popQueue(q_waiting);
         if (request == NULL)
         {
+            printf("11111111111111111111111111111111111111111111111111111");
             pthread_mutex_unlock(&m_queues_size);
             continue;
         }
         int connfd = request->data;
         stats.arrival_time = request->arrival_time;
         pushQueue(q_handled, connfd, stats.arrival_time);
-        pthread_mutex_unlock(&m_queues_size);
-
         gettimeofday(&handle, NULL);
         stats.handled_time = handle;
+        pthread_mutex_unlock(&m_queues_size);
+
         stats.stat_thread.count++;
         requestHandle(connfd, &stats);
         Close(connfd);

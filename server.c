@@ -58,18 +58,13 @@ void* thread_routine(struct routine_args* args) {
     Queue q_waiting = args->waiting;
     Queue q_handled = args->handling;
     while(1){
+
         pthread_mutex_lock(&m_queues_size);
         while (q_waiting->current_size <= 0) {
             pthread_cond_wait(&cond_empty, &m_queues_size);
         }
         struct timeval handle;
         Node request = popQueue(q_waiting);
-        if (request == NULL)
-        {
-            printf("11111111111111111111111111111111111111111111111111111");
-            pthread_mutex_unlock(&m_queues_size);
-            continue;
-        }
         int connfd = request->data;
         stats.arrival_time = request->arrival_time;
         pushQueue(q_handled, connfd, stats.arrival_time);
@@ -83,8 +78,8 @@ void* thread_routine(struct routine_args* args) {
 
         pthread_mutex_lock(&m_queues_size);
         deleteByValue(q_handled, connfd);
-        pthread_mutex_unlock(&m_queues_size);
         pthread_cond_signal(&cond_full);
+        pthread_mutex_unlock(&m_queues_size);
     }
 
 }
@@ -174,8 +169,8 @@ int main(int argc, char *argv[])
             }
         }
         pushQueue(q_waiting, connfd, arrival_time);
-        pthread_mutex_unlock(&m_queues_size);
         pthread_cond_signal(&cond_empty);
+        pthread_mutex_unlock(&m_queues_size);
     }
     deleteQueue(q_waiting);
     deleteQueue(q_handled);

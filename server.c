@@ -78,8 +78,8 @@ void* thread_routine(struct routine_args* args) {
 
         pthread_mutex_lock(&m_queues_size);
         deleteByValue(q_handled, connfd);
-        pthread_mutex_unlock(&m_queues_size);
         pthread_cond_signal(&cond_full);
+        pthread_mutex_unlock(&m_queues_size);
     }
 
 }
@@ -169,8 +169,8 @@ int main(int argc, char *argv[])
             }
         }
         pushQueue(q_waiting, connfd, arrival_time);
-        pthread_mutex_unlock(&m_queues_size);
         pthread_cond_signal(&cond_empty);
+        pthread_mutex_unlock(&m_queues_size);
     }
     deleteQueue(q_waiting);
     deleteQueue(q_handled);

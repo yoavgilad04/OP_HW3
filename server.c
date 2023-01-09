@@ -63,8 +63,8 @@ void* thread_routine(struct routine_args* args) {
             pthread_cond_wait(&cond_empty, &m_queues_size);
         }
         struct timeval handle;
-        gettimeofday(&handle, NULL);
         Node request = popQueue(q_waiting);
+        gettimeofday(&handle, NULL);
         if (request == NULL)
         {
             pthread_mutex_unlock(&m_queues_size);

@@ -8,17 +8,12 @@
 
 
 void addStatsToBuf(char* buf , Stats stats, int is_double_space){
-    long dispatch_tv_usec;
-    long dispatch_tv_sec;
-    if (stats.handled_time.tv_usec < stats.arrival_time.tv_usec)
+    long dispatch_tv_sec = stats.handled_time.tv_sec - stats.arrival_time.tv_sec;
+    long  dispatch_tv_usec = stats.handled_time.tv_usec - stats.arrival_time.tv_usec;
+    if (dispatch_tv_usec < 0)
     {
-        dispatch_tv_usec = (stats.handled_time.tv_usec + 1000000) - stats.arrival_time.tv_usec;
-        dispatch_tv_sec = stats.handled_time.tv_sec - stats.arrival_time.tv_sec - 1;
-    }
-    else
-    {
-        dispatch_tv_sec = stats.handled_time.tv_sec - stats.arrival_time.tv_sec;
-        dispatch_tv_usec = stats.handled_time.tv_usec - stats.arrival_time.tv_usec;
+        dispatch_tv_usec += 1000000;
+        dispatch_tv_sec -= 1;
     }
 
     sprintf(buf, "%sStat-Req-Arrival:: %lu.%06lu\r\n", buf, stats.arrival_time.tv_sec, stats.arrival_time.tv_usec);
@@ -144,14 +139,14 @@ void requestServeDynamic(int fd, char *filename, char *cgiargs, Stats* stats)
    addStatsToBuf(buf, *stats, 0);
    Rio_writen(fd, buf, strlen(buf));
     pid_t pid = Fork();
-   if (pid == 0) {
-      /* Child process */
-      Setenv("QUERY_STRING", cgiargs, 1);
-      /* When the CGI process writes to stdout, it will instead go to the socket */
-      Dup2(fd, STDOUT_FILENO);
-      Execve(filename, emptylist, environ);
-   }
-   WaitPid(pid, NULL, 0);
+    if (pid == 0) {
+        /* Child process */
+        Setenv("QUERY_STRING", cgiargs, 1);
+        /* When the CGI process writes to stdout, it will instead go to the socket */
+        Dup2(fd, STDOUT_FILENO);
+        Execve(filename, emptylist, environ);
+    }
+    WaitPid(pid, NULL, 0);
 }
 
 

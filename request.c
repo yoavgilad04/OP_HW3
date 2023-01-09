@@ -143,15 +143,15 @@ void requestServeDynamic(int fd, char *filename, char *cgiargs, Stats* stats)
    sprintf(buf, "%sServer: OS-HW3 Web Server\r\n", buf);
    addStatsToBuf(buf, *stats, 0);
    Rio_writen(fd, buf, strlen(buf));
-
-   if (Fork() == 0) {
+    pid_t pid = Fork();
+   if (pid == 0) {
       /* Child process */
       Setenv("QUERY_STRING", cgiargs, 1);
       /* When the CGI process writes to stdout, it will instead go to the socket */
       Dup2(fd, STDOUT_FILENO);
       Execve(filename, emptylist, environ);
    }
-   Wait(NULL);
+   WaitPid(pid, NULL, 0);
 }
 
 

@@ -100,7 +100,7 @@ routine_args *createArgs(int index, Queue q_waiting, Queue q_handled) {
 }
 
 pthread_t *createPool(int num_of_threads, Queue q_waiting, Queue q_handled) {
-    pthread_t *pool = (pthread_t *) malloc(sizeof(*pool) * num_of_threads);
+    pthread_t *pool = (pthread_t *)malloc(sizeof(*pool) * num_of_threads);
     //routine_args *args;
     for (int i = 0; i < num_of_threads; i++) {
         routine_args *args = createArgs(i, q_waiting, q_handled);
@@ -114,7 +114,7 @@ void deleteRandHalf(Queue q) {
     if (q->current_size == 1) {
         request = popQueue(q);
         Close(request->data);
-        deleteNode(request);
+//        deleteNode(request);
         return;
     }
     int half_size = ceil(q->current_size / 2);
@@ -123,7 +123,7 @@ void deleteRandHalf(Queue q) {
         r = rand() % q->current_size;
         request = PopByPosition(q, r);
         Close(request->data);
-        deleteNode(request);
+//        deleteNode(request);
     }
 }
 
@@ -181,7 +181,7 @@ int main(int argc, char *argv[]) {
                 } else {
                     Node request = popQueue(q_waiting);
                     Close(request->data);
-                    deleteNode(request);
+//                    deleteNode(request);
                 }
             }
                 // drop_random -> q_waiting.deleteRand()
@@ -201,11 +201,11 @@ int main(int argc, char *argv[]) {
         pthread_mutex_unlock(&m_waiting);
 
     }
-    free(pool);
+//    free(pool);
 //    deleteQueue(q_waiting);
 //    deleteQueue(q_handled);
-    pthread_mutex_destroy(&m_waiting);
-    pthread_cond_destroy(&cond_not_empty);
-    pthread_cond_destroy(&cond_not_full);
+//    pthread_mutex_destroy(&m_waiting);
+//    pthread_cond_destroy(&cond_not_empty);
+//    pthread_cond_destroy(&cond_not_full);
 }
 

@@ -13,6 +13,7 @@ struct stats_thread{
 struct stats{
     struct timeval arrival_time;
     struct timeval handled_time;
+    struct timeval dispatch_time;
     struct stats_thread stat_thread;
 };
 

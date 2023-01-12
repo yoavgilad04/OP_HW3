@@ -46,8 +46,6 @@ pthread_mutex_t m_handled;
 
 void init_cond_and_locks() {
     pthread_mutex_init(&m_waiting, NULL);
-    //pthread_mutex_init(&m_handled, NULL);
-
     pthread_cond_init(&cond_not_full, NULL);
     pthread_cond_init(&cond_not_empty, NULL);
     return;
@@ -71,9 +69,6 @@ void *thread_routine(struct routine_args *args) {
         Node request = popQueue(q_waiting);
         int connfd = request->data;
         stats.arrival_time = request->arrival_time;
-        //pthread_mutex_unlock(&m_waiting);
-
-        //pthread_mutex_lock(&m_handled);
         pushQueue(q_handled, connfd, stats.arrival_time);
 
         //update handle time
@@ -184,7 +179,6 @@ int main(int argc, char *argv[]) {
                     continue;
                 } else {
                     Node request = popQueue(q_waiting);
-                    //waiting_count--;
                     Close(request->data);
                     //deleteNode(request);
                 }

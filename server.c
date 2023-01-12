@@ -70,7 +70,7 @@ void *thread_routine(struct routine_args *args) {
         int connfd = request->data;
         stats.arrival_time = request->arrival_time;
         pushQueue(q_handled, connfd, stats.arrival_time);
-
+        deleteNode(request);
         //update handle time
         struct timeval handle;
         gettimeofday(&handle, NULL);
@@ -114,7 +114,7 @@ void deleteRandHalf(Queue q) {
     if (q->current_size == 1) {
         request = popQueue(q);
         Close(request->data);
-//        deleteNode(request);
+        deleteNode(request);
         return;
     }
     int half_size = ceil(q->current_size / 2);
@@ -123,7 +123,7 @@ void deleteRandHalf(Queue q) {
         r = rand() % q->current_size;
         request = PopByPosition(q, r);
         Close(request->data);
-//        deleteNode(request);
+        deleteNode(request);
     }
 }
 
@@ -181,7 +181,7 @@ int main(int argc, char *argv[]) {
                 } else {
                     Node request = popQueue(q_waiting);
                     Close(request->data);
-//                    deleteNode(request);
+                    deleteNode(request);
                 }
             }
                 // drop_random -> q_waiting.deleteRand()
@@ -201,11 +201,11 @@ int main(int argc, char *argv[]) {
         pthread_mutex_unlock(&m_waiting);
 
     }
-//    free(pool);
+    free(pool);
 //    deleteQueue(q_waiting);
 //    deleteQueue(q_handled);
-//    pthread_mutex_destroy(&m_waiting);
-//    pthread_cond_destroy(&cond_not_empty);
-//    pthread_cond_destroy(&cond_not_full);
+    pthread_mutex_destroy(&m_waiting);
+    pthread_cond_destroy(&cond_not_empty);
+    pthread_cond_destroy(&cond_not_full);
 }
 

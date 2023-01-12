@@ -88,6 +88,7 @@ void *thread_routine(struct routine_args *args) {
         pthread_cond_signal(&cond_not_full);
         pthread_mutex_unlock(&m_waiting);
     }
+    free(args);
 }
 
 routine_args *createArgs(int index, Queue q_waiting, Queue q_handled) {
@@ -180,7 +181,7 @@ int main(int argc, char *argv[]) {
                 } else {
                     Node request = popQueue(q_waiting);
                     Close(request->data);
-                    //deleteNode(request);
+                    deleteNode(request);
                 }
             }
                 // drop_random -> q_waiting.deleteRand()
@@ -201,14 +202,10 @@ int main(int argc, char *argv[]) {
 
     }
     free(pool);
-/*
-    deleteQueue(q_waiting);
-    deleteQueue(q_handled);
-
+//    deleteQueue(q_waiting);
+//    deleteQueue(q_handled);
     pthread_mutex_destroy(&m_waiting);
-    pthread_mutex_destroy(&m_handled);
-
     pthread_cond_destroy(&cond_not_empty);
-    pthread_cond_destroy(&cond_not_full);*/
+    pthread_cond_destroy(&cond_not_full);
 }
 
